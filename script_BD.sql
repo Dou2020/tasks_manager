@@ -1,5 +1,5 @@
 -- Crear la base de datos
-CREATE DATABASE TaskManagerDB;
+CREATE DATABASE task_manager_db;
 GO
 
 USE TaskManagerDB;
@@ -20,14 +20,14 @@ CREATE TABLE Users (
     updated_at DATETIME2 DEFAULT GETDATE(),
     last_login DATETIME2,
     
-    -- Índices
+    -- ï¿½ndices
     INDEX IX_Users_Username (username),
     INDEX IX_Users_Email (email),
     INDEX IX_Users_Active (is_active)
 );
 
 -- ================================================
--- TABLA: Categories (Categorías de tareas)
+-- TABLA: Categories (Categorï¿½as de tareas)
 -- ================================================
 CREATE TABLE Categories (
     category_id INT IDENTITY(1,1) PRIMARY KEY,
@@ -38,7 +38,7 @@ CREATE TABLE Categories (
     is_active BIT DEFAULT 1,
     created_at DATETIME2 DEFAULT GETDATE(),
     
-    -- Índices
+    -- ï¿½ndices
     INDEX IX_Categories_Name (name),
     INDEX IX_Categories_Active (is_active)
 );
@@ -48,8 +48,8 @@ CREATE TABLE Categories (
 -- ================================================
 CREATE TABLE Priorities (
     priority_id INT IDENTITY(1,1) PRIMARY KEY,
-    name NVARCHAR(20) NOT NULL, -- 'Alta', 'Media', 'Baja', 'Crítica'
-    level_number INT NOT NULL, -- 1=Crítica, 2=Alta, 3=Media, 4=Baja
+    name NVARCHAR(20) NOT NULL, -- 'Alta', 'Media', 'Baja', 'Crï¿½tica'
+    level_number INT NOT NULL, -- 1=Crï¿½tica, 2=Alta, 3=Media, 4=Baja
     color_hex NVARCHAR(7) DEFAULT '#FFA500',
     
     UNIQUE (level_number),
@@ -96,13 +96,13 @@ CREATE TABLE Tasks (
     notes NTEXT,
     is_archived BIT DEFAULT 0,
     
-    -- Claves foráneas
+    -- Claves forï¿½neas
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES Categories(category_id) ON DELETE SET NULL,
     FOREIGN KEY (priority_id) REFERENCES Priorities(priority_id) ON DELETE SET DEFAULT,
     FOREIGN KEY (status_id) REFERENCES Task_Status(status_id) ON DELETE SET DEFAULT,
     
-    -- Índices
+    -- ï¿½ndices
     INDEX IX_Tasks_UserId (user_id),
     INDEX IX_Tasks_CategoryId (category_id),
     INDEX IX_Tasks_PriorityId (priority_id),
@@ -128,7 +128,7 @@ CREATE TABLE Task_Comments (
     FOREIGN KEY (task_id) REFERENCES Tasks(task_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE NO ACTION,
     
-    -- Índices
+    -- ï¿½ndices
     INDEX IX_TaskComments_TaskId (task_id),
     INDEX IX_TaskComments_UserId (user_id),
     INDEX IX_TaskComments_CreatedAt (created_at)
@@ -143,14 +143,14 @@ CREATE TABLE Task_Attachments (
     user_id INT NOT NULL,
     file_name NVARCHAR(255) NOT NULL,
     file_path NVARCHAR(500) NOT NULL,
-    file_size BIGINT, -- Tamaño en bytes
+    file_size BIGINT, -- Tamaï¿½o en bytes
     file_type NVARCHAR(50), -- MIME type
     uploaded_at DATETIME2 DEFAULT GETDATE(),
     
     FOREIGN KEY (task_id) REFERENCES Tasks(task_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE NO ACTION,
     
-    -- Índices
+    -- ï¿½ndices
     INDEX IX_TaskAttachments_TaskId (task_id),
     INDEX IX_TaskAttachments_UserId (user_id)
 );
@@ -163,7 +163,7 @@ CREATE TABLE Task_History (
     task_id INT NOT NULL,
     user_id INT NOT NULL,
     action_type NVARCHAR(50) NOT NULL, -- 'CREATED', 'UPDATED', 'STATUS_CHANGED', 'DELETED'
-    field_name NVARCHAR(50), -- Campo que cambió
+    field_name NVARCHAR(50), -- Campo que cambiï¿½
     old_value NVARCHAR(MAX), -- Valor anterior
     new_value NVARCHAR(MAX), -- Nuevo valor
     change_description NVARCHAR(500),
@@ -172,7 +172,7 @@ CREATE TABLE Task_History (
     FOREIGN KEY (task_id) REFERENCES Tasks(task_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE NO ACTION,
     
-    -- Índices
+    -- ï¿½ndices
     INDEX IX_TaskHistory_TaskId (task_id),
     INDEX IX_TaskHistory_UserId (user_id),
     INDEX IX_TaskHistory_ActionType (action_type),
@@ -194,7 +194,7 @@ CREATE TABLE User_Sessions (
     
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
     
-    -- Índices
+    -- ï¿½ndices
     INDEX IX_UserSessions_UserId (user_id),
     INDEX IX_UserSessions_SocketId (socket_id),
     INDEX IX_UserSessions_Active (is_active)
