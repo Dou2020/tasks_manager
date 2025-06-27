@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Guardar tokens y redirigir a home
       localStorage.setItem('accessToken',  data.data.tokens.accessToken);
       localStorage.setItem('refreshToken', data.data.tokens.refreshToken);
+      localStorage.setItem('userData',   JSON.stringify(data.data.user));
       window.location.href = '/home.html';
 
     } catch (err) {
