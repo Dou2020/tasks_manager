@@ -1,23 +1,37 @@
 // src/routes/task.routes.js
 const express = require('express');
 const router = express.Router();
+const taskController = require('../controllers/task.controller');
 const { authenticateToken } = require('../middleware/auth.middleware');
-const { sanitizeInput, securityLogger } = require('../middleware/security.middleware');
+const {
+  validateCreateTask,
+  validateUpdateTask,
+  validateTaskId,
+  validateTaskFilters,
+  validateUpcomingDays
+} = require('../validators/task.validator');
 
-// Aplicar middlewares de seguridad y autenticación a todas las rutas
-router.use(securityLogger);
-router.use(sanitizeInput);
+// Middleware de autenticación para todas las rutas
 router.use(authenticateToken);
 
-// Ruta temporal para verificar que funciona
-router.get('/test', (req, res) => {
-  res.json({
-    success: true,
-    message: 'API de tareas funcionando correctamente',
-    user: req.user.toJSON()
-  });
-});
+// Rutas para obtener datos de referencia (no requieren validación especial)
+router.get('/categories', taskController.getCategories);
+router.get('/priorities', taskController.getPriorities);
+router.get('/statuses', taskController.getTaskStatuses);
 
-// Aquí implementarás las rutas para CRUD de tareas después
+// Rutas para estadísticas y reportes
+router.get('/stats', taskController.getUserStats);
+router.get('/upcoming', validateUpcomingDays, taskController.getUpcomingTasks);
+
+// CRUD de tareas
+router.get('/', validateTaskFilters, taskController.getTasks);
+router.get('/:id', validateTaskId, taskController.getTaskById);
+router.post('/', validateCreateTask, taskController.createTask);
+router.put('/:id', validateTaskId, validateUpdateTask, taskController.updateTask);
+router.delete('/:id', validateTaskId, taskController.deleteTask);
+
+// Rutas específicas para archivado
+router.patch('/:id/archive', validateTaskId, taskController.archiveTask);
+router.patch('/:id/unarchive', validateTaskId, taskController.unarchiveTask);
 
 module.exports = router;

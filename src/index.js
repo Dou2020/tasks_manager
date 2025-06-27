@@ -6,6 +6,11 @@ const { testConnection, syncDatabase, closeConnection } = require('./config/data
 
 // Importar modelos para registrarlos
 require('./models/User');
+require('./models/Task');
+require('./models/Category');
+require('./models/Priority');
+require('./models/TaskStatus');
+
 
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
