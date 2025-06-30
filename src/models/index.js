@@ -1,55 +1,27 @@
-// src/models/index.js
+const sequelize = require('../config/sequelize');
 const User = require('./User');
+const Project = require('./Project');
 const Task = require('./Task');
-const Category = require('./Category');
-const Priority = require('./Priority');
-const TaskStatus = require('./TaskStatus');
+const Comment = require('./Comment');
+const ProjectMember = require('./ProjectMember');
 
-// Definir asociaciones
-User.hasMany(Task, {
-  foreignKey: 'user_id',
-  as: 'tasks'
-});
+// Relaciones
+User.hasMany(Project, { foreignKey: 'ownerId', as: 'ownedProjects' });
+Project.belongsTo(User, { foreignKey: 'ownerId', as: 'owner' });
 
-Task.belongsTo(User, {
-  foreignKey: 'user_id',
-  as: 'user'
-});
+Project.belongsToMany(User, { through: ProjectMember, foreignKey: 'projectId', as: 'members' });
+User.belongsToMany(Project, { through: ProjectMember, foreignKey: 'userId', as: 'projects' });
 
-Category.hasMany(Task, {
-  foreignKey: 'category_id',
-  as: 'tasks'
-});
+Project.hasMany(Task, { foreignKey: 'projectId', as: 'tasks' });
+Task.belongsTo(Project, { foreignKey: 'projectId', as: 'project' });
 
-Task.belongsTo(Category, {
-  foreignKey: 'category_id',
-  as: 'category'
-});
+User.hasMany(Task, { foreignKey: 'assignedTo', as: 'assignedTasks' });
+Task.belongsTo(User, { foreignKey: 'assignedTo', as: 'assignee' });
 
-Priority.hasMany(Task, {
-  foreignKey: 'priority_id',
-  as: 'tasks'
-});
+Task.hasMany(Comment, { foreignKey: 'taskId', as: 'comments' });
+Comment.belongsTo(Task, { foreignKey: 'taskId', as: 'task' });
 
-Task.belongsTo(Priority, {
-  foreignKey: 'priority_id',
-  as: 'priority'
-});
+User.hasMany(Comment, { foreignKey: 'userId', as: 'comments' });
+Comment.belongsTo(User, { foreignKey: 'userId', as: 'author' });
 
-TaskStatus.hasMany(Task, {
-  foreignKey: 'status_id',
-  as: 'tasks'
-});
-
-Task.belongsTo(TaskStatus, {
-  foreignKey: 'status_id',
-  as: 'status'
-});
-
-module.exports = {
-  User,
-  Task,
-  Category,
-  Priority,
-  TaskStatus
-};
+module.exports = { sequelize, User, Project, Task, Comment, ProjectMember };
