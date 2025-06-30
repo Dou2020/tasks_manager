@@ -46,7 +46,13 @@ io.on('connection', (socket) => {
 
 // Import routes
 const authRoutes = require('./src/routes/auth');
+const projectRoutes = require('./src/routes/projects');
+const taskRoutes = require('./src/routes/tasks');
+
+// Registramos las rutas - el orden es importante
 app.use('/auth', authRoutes);
+app.use('/', taskRoutes);  // Primero registramos las rutas de tareas
+app.use('/projects', projectRoutes); // Después las de proyectos
 
 // Protect dashboard
 const { ensureAuth } = require('./src/middlewares/auth');

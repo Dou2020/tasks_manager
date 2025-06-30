@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= project.name %> | Task Manager</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    /* Estilos adicionales */
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    /* Estilo para el drag and drop */
+    .task-card.dragging {
+      opacity: 0.5;
+    }
+    
+    .task-column.drag-over {
+      background-color: #f0f9ff;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <% const currentPage = 'projects'; %>
+  <%- include('../partials/navbar', { user, currentPage }) %>
+
+  <div class="container mx-auto p-4">
+    <!-- Encabezado del proyecto -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h1 class="text-3xl font-bold mb-2"><%= project.name %></h1>
+          <p class="text-gray-600"><%= project.description || 'Sin descripción' %></p>
+        </div>
+        
+        <div class="flex space-x-2">
+          <% if (isOwner) { %>
+            <button id="invite-btn" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+              Invitar
+            </button>
+          <% } %>
+          <button id="create-task-btn" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Nueva Tarea
+          </button>
+        </div>
+      </div>
+      
+      <div class="flex flex-wrap items-center text-sm">
+        <div class="mr-6 mb-2">
+          <span class="text-gray-600">Creado por:</span>
+          <span class="font-semibold"><%= project.owner.name %></span>
+        </div>
+        <div class="mr-6 mb-2">
+          <span class="text-gray-600">Estado:</span>
+          <span class="font-semibold"><%= project.status %></span>
+        </div>
+        <div class="mb-2">
+          <span class="text-gray-600">Miembros:</span>
+          <span class="font-semibold"><%= project.members ? project.members.length : 0 %></span>
+        </div>
+      </div>
+      
+      <div class="mt-4">
+        <h3 class="font-semibold mb-2">Equipo:</h3>
+        <div class="flex flex-wrap">
+          <div class="bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm mr-2 mb-2 flex items-center">
+            <img src="https://ui-avatars.com/api/?name=<%= project.owner.name %>&size=20&background=random" alt="Avatar" class="rounded-full mr-1">
+            <%= project.owner.name %> (Propietario)
+          </div>
+          <% if (project.members) { %>
+            <% project.members.forEach(member => { %>
+              <div class="bg-gray-100 text-gray-800 rounded-full px-3 py-1 text-sm mr-2 mb-2 flex items-center">
+                <img src="https://ui-avatars.com/api/?name=<%= member.name %>&size=20&background=random" alt="Avatar" class="rounded-full mr-1">
+                <%= member.name %>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tablero Kanban -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Columna: Por hacer -->
+      <div class="bg-white rounded-lg shadow-md p-4 task-column" data-status="Por hacer">
+        <h3 class="text-lg font-semibold mb-3 text-gray-700 border-b pb-2">Por hacer</h3>
+        <div id="todo-tasks" class="space-y-3 min-h-[200px]">
+          <!-- Las tareas se cargarán dinámicamente -->
+          <p class="text-gray-400 text-center py-8">Cargando tareas...</p>
+        </div>
+      </div>
+      
+      <!-- Columna: En progreso -->
+      <div class="bg-white rounded-lg shadow-md p-4 task-column" data-status="En progreso">
+        <h3 class="text-lg font-semibold mb-3 text-gray-700 border-b pb-2">En progreso</h3>
+        <div id="inprogress-tasks" class="space-y-3 min-h-[200px]">
+          <!-- Las tareas se cargarán dinámicamente -->
+          <p class="text-gray-400 text-center py-8">Cargando tareas...</p>
+        </div>
+      </div>
+      
+      <!-- Columna: Completado -->
+      <div class="bg-white rounded-lg shadow-md p-4 task-column" data-status="Completado">
+        <h3 class="text-lg font-semibold mb-3 text-gray-700 border-b pb-2">Completado</h3>
+        <div id="completed-tasks" class="space-y-3 min-h-[200px]">
+          <!-- Las tareas se cargarán dinámicamente -->
+          <p class="text-gray-400 text-center py-8">Cargando tareas...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para invitar usuarios -->
+  <div id="invite-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold">Invitar usuario</h3>
+        <button class="close-modal text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="invite-form">
+        <div class="mb-4">
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email del usuario</label>
+          <input type="email" name="email" id="invite-email" required class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
+          <p class="text-sm text-gray-500 mt-1">El usuario debe estar registrado en Task Manager.</p>
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button type="button" class="close-modal py-2 px-4 border rounded hover:bg-gray-100">Cancelar</button>
+          <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Invitar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para crear tarea -->
+  <div id="task-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold">Nueva Tarea</h3>
+        <button class="close-modal text-gray-500 hover:text-gray-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <form id="task-form">
+        <div class="mb-4">
+          <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Título</label>
+          <input type="text" name="title" id="task-title" required class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div class="mb-4">
+          <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+          <textarea name="description" id="task-description" rows="3" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"></textarea>
+        </div>
+        <div class="mb-4">
+          <label for="assignedTo" class="block text-sm font-medium text-gray-700 mb-1">Asignar a</label>
+          <select name="assignedTo" id="task-assigned" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Sin asignar</option>
+            <option value="<%= user.id %>">Yo</option>
+            <!-- Más opciones se cargarán dinámicamente -->
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="priority" class="block text-sm font-medium text-gray-700 mb-1">Prioridad</label>
+            <select name="priority" id="task-priority" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
+              <option value="Baja">Baja</option>
+              <option value="Media" selected>Media</option>
+              <option value="Alta">Alta</option>
+            </select>
+          </div>
+          <div>
+            <label for="dueDate" class="block text-sm font-medium text-gray-700 mb-1">Fecha límite</label>
+            <input type="date" name="dueDate" id="task-due-date" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button type="button" class="close-modal py-2 px-4 border rounded hover:bg-gray-100">Cancelar</button>
+          <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Crear Tarea</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para detalles/editar tarea -->
+  <%- include('../partials/task-modal') %>
+
+  <script>
+    // Datos del proyecto para JavaScript
+    const projectId = '<%= project.id %>';
+    const isOwner = <%= isOwner %>;
+  </script>
+  <script src="/js/project.js"></script>
+  <script src="/js/tasks.js"></script>
+  <script>
+    // Inicializar el gestor de tareas cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+      window.taskManager = new TaskManager(projectId);
+    });
+  </script>
+</body>
+</html>

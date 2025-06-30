@@ -7,19 +7,8 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 min-h-screen">
-  <nav class="bg-blue-600 text-white p-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <h1 class="text-xl font-bold">Task Manager</h1>
-      <div class="flex items-center space-x-4">
-        <span>Bienvenido, <%= user.name %></span>
-        <form action="/auth/logout" method="POST">
-          <button type="submit" class="bg-red-500 hover:bg-red-700 text-white py-1 px-3 rounded">
-            Cerrar Sesión
-          </button>
-        </form>
-      </div>
-    </div>
-  </nav>
+  <% const currentPage = 'dashboard'; %>
+  <%- include('partials/navbar', { user, currentPage }) %>
 
   <div class="container mx-auto p-4">
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -54,12 +43,27 @@
     </div>
 
     <div class="bg-white rounded-lg shadow-md p-6">
-      <h2 class="text-2xl font-bold mb-4">Mis Proyectos</h2>
-      <p class="text-gray-700">No hay proyectos disponibles.</p>
-      <button class="mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
-        Crear Proyecto
-      </button>
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold">Mis Proyectos Recientes</h2>
+        <a href="/projects" class="text-blue-600 hover:underline">Ver todos</a>
+      </div>
+      <div id="recent-projects-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="p-4 border rounded-lg bg-gray-50 flex items-center justify-center">
+          <p class="text-gray-500">Cargando proyectos...</p>
+        </div>
+      </div>
+      <div class="mt-4 text-center">
+        <button id="create-project-btn" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
+          Crear Nuevo Proyecto
+        </button>
+      </div>
     </div>
   </div>
+
+  <!-- Incluir modal para crear proyecto -->
+  <%- include('partials/project-modal') %>
+
+  <!-- Script -->
+  <script src="/js/dashboard.js"></script>
 </body>
 </html>

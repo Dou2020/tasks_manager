@@ -18,6 +18,7 @@ Task.belongsTo(Project, { foreignKey: 'projectId', as: 'project' });
 User.hasMany(Task, { foreignKey: 'assignedTo', as: 'assignedTasks' });
 Task.belongsTo(User, { foreignKey: 'assignedTo', as: 'assignee' });
 
+// Relaciones para Task y Comment que pueden estar faltando
 Task.hasMany(Comment, { foreignKey: 'taskId', as: 'comments' });
 Comment.belongsTo(Task, { foreignKey: 'taskId', as: 'task' });
 
