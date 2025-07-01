@@ -1,0 +1,142 @@
+<nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+  <div class="container mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo y navegación principal -->
+      <div class="flex items-center space-x-8">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center">
+            <i class="fas fa-tasks text-white text-lg"></i>
+          </div>
+          <h1 class="text-xl font-bold text-gray-800">Task Manager</h1>
+        </div>
+        
+        <!-- Navegación desktop -->
+        <div class="hidden md:flex space-x-1">
+          <a href="/dashboard" class="px-4 py-2 rounded-lg font-medium transition-all duration-200 <%= currentPage === 'dashboard' ? 'bg-emerald-100 text-emerald-700 shadow-sm' : 'text-gray-600 hover:text-emerald-600 hover:bg-emerald-50' %>">
+            <i class="fas fa-tachometer-alt mr-2"></i>
+            Dashboard
+          </a>
+          <a href="/projects" class="px-4 py-2 rounded-lg font-medium transition-all duration-200 <%= currentPage === 'projects' ? 'bg-emerald-100 text-emerald-700 shadow-sm' : 'text-gray-600 hover:text-emerald-600 hover:bg-emerald-50' %>">
+            <i class="fas fa-project-diagram mr-2"></i>
+            Proyectos
+          </a>
+        </div>
+      </div>
+      
+      <!-- Usuario y menú -->
+      <div class="flex items-center space-x-4">
+        <!-- Saludo desktop -->
+        <div class="hidden lg:block text-gray-600">
+          <span class="text-sm">Hola, </span>
+          <span class="font-semibold text-emerald-700"><%= user.name %></span>
+        </div>
+        
+        <!-- Avatar y dropdown -->
+        <div class="relative">
+          <button id="user-menu-btn" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+            <img src="https://ui-avatars.com/api/?name=<%= user.name %>&background=10b981&color=ffffff&bold=true" alt="Avatar" class="w-8 h-8 rounded-full ring-2 ring-emerald-200">
+            <i class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-200" id="dropdown-arrow"></i>
+          </button>
+          
+          <!-- Dropdown menu -->
+          <div id="user-dropdown" class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50 opacity-0 invisible transform scale-95 transition-all duration-200 origin-top-right">
+            <!-- User info en mobile -->
+            <div class="px-4 py-3 border-b border-gray-100 lg:hidden">
+              <p class="text-sm font-medium text-gray-800"><%= user.name %></p>
+              <p class="text-xs text-gray-500 truncate"><%= user.email %></p>
+            </div>
+            
+            <a href="/profile" class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors duration-200">
+              <i class="fas fa-user-circle w-5 mr-3 text-gray-400"></i>
+              Mi Perfil
+            </a>
+            
+            
+            <div class="border-t border-gray-100 mt-2 pt-2">
+              <form action="/auth/logout" method="POST" class="block">
+                <button type="submit" class="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 transition-colors duration-200">
+                  <i class="fas fa-sign-out-alt w-5 mr-3"></i>
+                  Cerrar Sesión
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Navegación móvil -->
+<div class="md:hidden bg-white border-t border-gray-200 shadow-sm">
+  <div class="container mx-auto px-4 py-2">
+    <div class="flex justify-around">
+      <a href="/dashboard" class="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 <%= currentPage === 'dashboard' ? 'text-emerald-600 bg-emerald-50' : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50' %>">
+        <i class="fas fa-tachometer-alt text-lg mb-1"></i>
+        <span class="text-xs font-medium">Inicio</span>
+      </a>
+      
+      <a href="/projects" class="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 <%= currentPage === 'projects' ? 'text-emerald-600 bg-emerald-50' : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50' %>">
+        <i class="fas fa-project-diagram text-lg mb-1"></i>
+        <span class="text-xs font-medium">Proyectos</span>
+      </a>
+      
+      <a href="/profile" class="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 <%= currentPage === 'profile' ? 'text-emerald-600 bg-emerald-50' : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50' %>">
+        <i class="fas fa-user-circle text-lg mb-1"></i>
+        <span class="text-xs font-medium">Perfil</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const userMenuBtn = document.getElementById('user-menu-btn');
+  const userDropdown = document.getElementById('user-dropdown');
+  const dropdownArrow = document.getElementById('dropdown-arrow');
+  
+  let isOpen = false;
+  
+  // Toggle dropdown
+  userMenuBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    toggleDropdown();
+  });
+  
+  // Cerrar dropdown al hacer clic fuera
+  document.addEventListener('click', function(e) {
+    if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+      closeDropdown();
+    }
+  });
+  
+  // Cerrar dropdown con Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && isOpen) {
+      closeDropdown();
+    }
+  });
+  
+  function toggleDropdown() {
+    if (isOpen) {
+      closeDropdown();
+    } else {
+      openDropdown();
+    }
+  }
+  
+  function openDropdown() {
+    isOpen = true;
+    userDropdown.classList.remove('opacity-0', 'invisible', 'scale-95');
+    userDropdown.classList.add('opacity-100', 'visible', 'scale-100');
+    dropdownArrow.style.transform = 'rotate(180deg)';
+  }
+  
+  function closeDropdown() {
+    isOpen = false;
+    userDropdown.classList.remove('opacity-100', 'visible', 'scale-100');
+    userDropdown.classList.add('opacity-0', 'invisible', 'scale-95');
+    dropdownArrow.style.transform = 'rotate(0deg)';
+  }
+});
+</script>

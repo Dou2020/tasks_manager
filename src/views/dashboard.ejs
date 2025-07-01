@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+  <% const currentPage = 'dashboard'; %>
+  <%- include('partials/navbar', { user, currentPage }) %>
+
+  <div class="container mx-auto p-6 max-w-7xl">
+    <!-- Header Section -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">
+        <i class="fas fa-tachometer-alt text-emerald-600 mr-3"></i>
+        Dashboard
+      </h1>
+      <p class="text-gray-600">Bienvenido de vuelta, <span class="font-semibold text-emerald-600"><%= user.name %></span></p>
+    </div>
+
+    <!-- User Information Card -->
+    <div class="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+      <div class="flex items-center mb-6">
+        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mr-4">
+          <i class="fas fa-user text-emerald-600 text-lg"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800">Información del Usuario</h2>
+      </div>
+      
+      <% if (typeof error !== 'undefined') { %>
+        <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg mb-6 flex items-center">
+          <i class="fas fa-exclamation-triangle mr-3"></i>
+          <%= error %>
+        </div>
+      <% } %>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+          <div class="flex items-center mb-2">
+            <i class="fas fa-at text-emerald-600 mr-2"></i>
+            <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Username</p>
+          </div>
+          <p class="font-semibold text-gray-800 text-lg"><%= user.username %></p>
+        </div>
+        
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+          <div class="flex items-center mb-2">
+            <i class="fas fa-user-circle text-emerald-600 mr-2"></i>
+            <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Nombre Completo</p>
+          </div>
+          <p class="font-semibold text-gray-800 text-lg"><%= user.name %></p>
+        </div>
+        
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+          <div class="flex items-center mb-2">
+            <i class="fas fa-envelope text-emerald-600 mr-2"></i>
+            <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Email</p>
+          </div>
+          <p class="font-semibold text-gray-800 text-lg break-all"><%= user.email %></p>
+        </div>
+        
+        <% if (user.first_name || user.last_name) { %>
+          <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+            <div class="flex items-center mb-2">
+              <i class="fas fa-id-card text-emerald-600 mr-2"></i>
+              <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Nombre / Apellido</p>
+            </div>
+            <p class="font-semibold text-gray-800 text-lg"><%= user.first_name || '' %> <%= user.last_name || '' %></p>
+          </div>
+        <% } %>
+        
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
+          <div class="flex items-center mb-2">
+            <i class="fas fa-calendar-alt text-emerald-600 mr-2"></i>
+            <p class="text-sm font-medium text-gray-500 uppercase tracking-wide">Cuenta creada</p>
+          </div>
+          <p class="font-semibold text-gray-800 text-lg"><%= new Date(user.createdAt).toLocaleDateString() %></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Projects Section -->
+    <div class="bg-white rounded-xl shadow-lg p-8 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+      <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center">
+          <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mr-4">
+            <i class="fas fa-project-diagram text-emerald-600 text-lg"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800">Mis Proyectos Recientes</h2>
+        </div>
+        <a href="/projects" class="inline-flex items-center px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors duration-200 font-medium">
+          <span>Ver todos</span>
+          <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+      </div>
+      
+      <div id="recent-projects-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="p-6 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50 flex items-center justify-center min-h-32">
+          <div class="text-center">
+            <div class="animate-spin w-8 h-8 border-4 border-emerald-200 border-t-emerald-600 rounded-full mx-auto mb-3"></div>
+            <p class="text-gray-500 font-medium">Cargando proyectos...</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-8 text-center">
+        <button id="create-project-btn" class="inline-flex items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
+          <i class="fas fa-plus mr-2"></i>
+          Crear Nuevo Proyecto
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Incluir modal para crear proyecto -->
+  <%- include('partials/project-modal') %>
+
+  <!-- Script -->
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>

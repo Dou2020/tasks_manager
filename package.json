@@ -1,11 +1,11 @@
 {
   "name": "task-manager",
   "version": "1.0.0",
-  "description": "Sistema de gestión de tareas en tiempo real con Express.js, SQL Server y Socket.IO",
-  "main": "src/index.js",
+  "description": "Sistema de gestión de tareas tipo Trello con Node.js, Express, EJS, MSSQL y Socket.IO",
+  "main": "app.js",
   "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "migrate": "sequelize db:migrate",
     "migrate:undo": "sequelize db:migrate:undo:all",
     "db:migrate": "sequelize db:migrate --config sequelize.config.js --migrations-path src/migrations",
@@ -14,27 +14,23 @@
     "db:seed:undo": "sequelize db:seed:undo:all --config sequelize.config.js --seeders-path src/seeders"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^4.21.2",
-    "express-rate-limit": "^7.5.1",
-    "express-validator": "^7.2.1",
-    "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.2",
+    "bcrypt": "^5.1.0",
+    "connect-session-sequelize": "^8.0.0",
+    "cookie": "^1.0.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "mssql": "^9.3.1",
+    "nodemailer": "^6.10.1",
     "sequelize": "^6.37.7",
-    "socket.io": "^4.8.1",
-    "tedious": "^14.7.0",
-    "winston": "^3.17.0",
-    "express-mongo-sanitize": "^2.2.0",
-    "xss-clean": "^0.1.4",
-    "hpp": "^0.2.3"
+    "socket.io": "^4.7.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10",
+    "nodemon": "^2.0.22",
     "sequelize-cli": "^6.6.3"
   },
-  "engines": {
-    "node": ">=16.0.0"
-  }
+  "author": "El equipo Fundacion",
+  "license": "MIT"
 }
