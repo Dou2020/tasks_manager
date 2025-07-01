@@ -1,4 +1,5 @@
 const transporter = require('../config/mailer');
+const EmailTemplates = require('./emailTemplates');
 
 class EmailService {
   /**
@@ -16,30 +17,76 @@ class EmailService {
     const projectUrl = `${appUrl}/projects/${projectId}/view`;
     
     try {
+      const html = EmailTemplates.projectInvitation({
+        invitedByName,
+        projectName,
+        projectUrl
+      });
+      
       const info = await transporter.sendMail({
         from: `"Task Manager" <${process.env.EMAIL_USER}>`,
         to,
         subject: `Invitación al proyecto: ${projectName}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2>Has sido invitado a un proyecto!</h2>
-            <p>${invitedByName} te ha invitado a colaborar en el proyecto <strong>${projectName}</strong>.</p>
-            <p>Para acceder al proyecto, inicia sesión en tu cuenta y ve a la sección de proyectos, o haz clic en el siguiente enlace:</p>
-            <p style="margin: 20px 0;">
-              <a href="${projectUrl}" style="background-color: #4CAF50; color: white; padding: 10px 15px; text-decoration: none; border-radius: 4px;">
-                Ver proyecto
-              </a>
-            </p>
-            <p>Si no tienes una cuenta en Task Manager, regístrate primero y luego podrás acceder a este proyecto.</p>
-            <p>¡Gracias por usar Task Manager!</p>
-          </div>
-        `
+        html
       });
       
       console.log('✉️ Correo de invitación enviado: %s', info.messageId);
       return true;
     } catch (error) {
       console.error('❌ Error al enviar correo de invitación:', error);
+      return false;
+    }
+  }
+  
+  /**
+   * Envía un correo de notificación de tarea asignada
+   * @param {Object} options - Opciones del correo
+   * @param {string} options.to - Email del destinatario
+   * @param {string} options.assignedBy - Nombre de quien asigna
+   * @param {string} options.taskTitle - Título de la tarea
+   * @param {string} options.projectName - Nombre del proyecto
+   * @param {number} options.projectId - ID del proyecto
+   * @param {number} options.taskId - ID de la tarea
+   * @param {string} [options.priority] - Prioridad de la tarea
+   * @param {string} [options.dueDate] - Fecha límite de la tarea
+   */
+  static async sendTaskAssignmentNotification(options) {
+    const { to, assignedBy, taskTitle, projectName, projectId, taskId, priority, dueDate } = options;
+    
+    const appUrl = process.env.APP_URL || 'http://localhost:3000';
+    const taskUrl = `${appUrl}/projects/${projectId}/view?task=${taskId}`;
+    
+    // Determinar color de prioridad
+    let priorityColor = '#4F46E5'; // Azul por defecto
+    if (priority === 'Alta') priorityColor = '#DC2626'; // Rojo
+    else if (priority === 'Media') priorityColor = '#F59E0B'; // Ámbar
+    else if (priority === 'Baja') priorityColor = '#10B981'; // Verde
+    
+    // Formatear fecha límite si existe
+    const dueDateFormatted = dueDate ? new Date(dueDate).toLocaleDateString() : 'No definida';
+    
+    try {
+      const html = EmailTemplates.taskAssignment({
+        assignedBy,
+        taskTitle,
+        projectName,
+        taskUrl,
+        priority,
+        dueDateFormatted,
+        priorityColor
+      });
+      
+      const info = await transporter.sendMail({
+        from: `"Task Manager" <${process.env.EMAIL_USER}>`,
+        to,
+        subject: `Te han asignado una tarea: ${taskTitle}`,
+        html
+      });
+      
+      console.log('✉️ Correo de notificación de tarea enviado: %s', info.messageId);
+      return true;
+    } catch (error) {
+      console.error('❌ Error al enviar correo de notificación de tarea:', error);
       return false;
     }
   }

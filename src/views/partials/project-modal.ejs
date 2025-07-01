@@ -1,28 +1,123 @@
-<div id="project-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-  <div class="bg-white rounded-lg p-6 w-full max-w-md">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold">Crear Nuevo Proyecto</h3>
-      <button class="close-modal text-gray-500 hover:text-gray-700">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
+<!-- Modal para crear proyecto -->
+<div id="project-modal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div class="modal-content bg-white rounded-2xl shadow-2xl w-full max-w-lg transform scale-95 opacity-0 transition-all duration-200">
+    <!-- Header del Modal -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-200">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+          <i class="fas fa-plus text-emerald-600"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800">Crear Nuevo Proyecto</h3>
+      </div>
+      <button class="close-modal w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors duration-200 text-gray-400 hover:text-gray-600">
+        <i class="fas fa-times"></i>
       </button>
     </div>
-    <form id="project-form">
-      <div class="mb-4">
-        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nombre del proyecto *</label>
-        <input type="text" name="name" id="project-name" required minlength="3" maxlength="100" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
-        <div class="text-xs text-red-600 hidden" id="name-error">El nombre del proyecto es obligatorio.</div>
+
+    <!-- Contenido del Modal -->
+    <form id="project-form" class="p-6">
+      <div class="space-y-6">
+        <!-- Campo Nombre -->
+        <div>
+          <label for="project-name" class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-tag text-emerald-600 mr-2"></i>
+            Nombre del Proyecto *
+          </label>
+          <input 
+            type="text" 
+            id="project-name" 
+            name="name"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 placeholder-gray-400"
+            placeholder="Ej: Sistema de Gestión de Inventario"
+            required
+          >
+          <div id="name-error" class="hidden mt-2 flex items-center text-red-600 text-sm">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            El nombre del proyecto es obligatorio
+          </div>
+        </div>
+
+        <!-- Campo Descripción -->
+        <div>
+          <label for="project-description" class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-align-left text-emerald-600 mr-2"></i>
+            Descripción
+          </label>
+          <textarea 
+            id="project-description" 
+            name="description"
+            rows="4"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 placeholder-gray-400 resize-none"
+            placeholder="Describe brevemente el objetivo y alcance de tu proyecto..."
+          ></textarea>
+          <p class="mt-2 text-xs text-gray-500">
+            <i class="fas fa-info-circle mr-1"></i>
+            La descripción es opcional pero ayuda a organizar mejor tus proyectos
+          </p>
+        </div>
       </div>
-      <div class="mb-4">
-        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-        <textarea name="description" id="project-description" rows="3" maxlength="500" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"></textarea>
-        <p class="text-xs text-gray-500 mt-1">Describe brevemente el objetivo del proyecto (opcional).</p>
-      </div>
-      <div class="flex justify-end space-x-2">
-        <button type="button" class="close-modal py-2 px-4 border rounded hover:bg-gray-100">Cancelar</button>
-        <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Crear Proyecto</button>
+
+      <!-- Footer del Modal -->
+      <div class="flex justify-end space-x-3 mt-8 pt-6 border-t border-gray-200">
+        <button 
+          type="button" 
+          class="close-modal px-6 py-3 text-gray-600 hover:text-gray-800 font-medium rounded-lg hover:bg-gray-100 transition-all duration-200"
+        >
+          <i class="fas fa-times mr-2"></i>
+          Cancelar
+        </button>
+        <button 
+          type="submit" 
+          class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center"
+        >
+          <i class="fas fa-plus mr-2"></i>
+          Crear Proyecto
+        </button>
       </div>
     </form>
   </div>
 </div>
+
+<style>
+/* Animaciones adicionales para el modal */
+.modal-content {
+  animation-duration: 0.2s;
+  animation-fill-mode: both;
+}
+
+/* Mejoras visuales */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Efecto de focus mejorado */
+input:focus, textarea:focus {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Hover effects */
+.hover\:-translate-y-0\.5:hover {
+  transform: translateY(-2px);
+}
+
+.hover\:-translate-y-1:hover {
+  transform: translateY(-4px);
+}
+
+/* Backdrop blur para navegadores que lo soporten */
+@supports (backdrop-filter: blur(4px)) {
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+  }
+}
+</style>

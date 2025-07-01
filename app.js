@@ -58,11 +58,13 @@ socketModule.init(sessionMiddleware);
 const authRoutes = require('./src/routes/auth');
 const projectRoutes = require('./src/routes/projects');
 const taskRoutes = require('./src/routes/tasks');
+const userRoutes = require('./src/routes/users');  // Importar las nuevas rutas de usuario
 
 // Registramos las rutas - el orden es importante
 app.use('/auth', authRoutes);
 app.use('/', taskRoutes);  // Primero registramos las rutas de tareas
 app.use('/projects', projectRoutes); // Después las de proyectos
+app.use('/', userRoutes); // Registrar rutas de usuario
 
 // Protect dashboard
 const { ensureAuth } = require('./src/middlewares/auth');

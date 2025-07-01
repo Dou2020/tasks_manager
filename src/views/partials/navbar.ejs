@@ -1,56 +1,142 @@
-<nav class="bg-blue-600 text-white p-4 shadow-md">
-  <div class="container mx-auto flex justify-between items-center">
-    <div class="flex items-center space-x-4">
-      <h1 class="text-xl font-bold">Task Manager</h1>
-      <div class="hidden md:flex space-x-4">
-        <a href="/dashboard" class="hover:text-blue-200 transition-colors <%= currentPage === 'dashboard' ? 'border-b-2 border-white' : '' %>">Dashboard</a>
-        <a href="/projects" class="hover:text-blue-200 transition-colors <%= currentPage === 'projects' ? 'border-b-2 border-white' : '' %>">Proyectos</a>
+<nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+  <div class="container mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo y navegación principal -->
+      <div class="flex items-center space-x-8">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center">
+            <i class="fas fa-tasks text-white text-lg"></i>
+          </div>
+          <h1 class="text-xl font-bold text-gray-800">Task Manager</h1>
+        </div>
+        
+        <!-- Navegación desktop -->
+        <div class="hidden md:flex space-x-1">
+          <a href="/dashboard" class="px-4 py-2 rounded-lg font-medium transition-all duration-200 <%= currentPage === 'dashboard' ? 'bg-emerald-100 text-emerald-700 shadow-sm' : 'text-gray-600 hover:text-emerald-600 hover:bg-emerald-50' %>">
+            <i class="fas fa-tachometer-alt mr-2"></i>
+            Dashboard
+          </a>
+          <a href="/projects" class="px-4 py-2 rounded-lg font-medium transition-all duration-200 <%= currentPage === 'projects' ? 'bg-emerald-100 text-emerald-700 shadow-sm' : 'text-gray-600 hover:text-emerald-600 hover:bg-emerald-50' %>">
+            <i class="fas fa-project-diagram mr-2"></i>
+            Proyectos
+          </a>
+        </div>
       </div>
-    </div>
-    
-    <div class="flex items-center space-x-4">
-      <div class="hidden md:block">
-        <span>Hola, <%= user.name %></span>
-      </div>
-      <form action="/auth/logout" method="POST" class="block">
-            <button type="submit" class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100">Cerrar Sesión</button>
-          </form>
-      <div class="relative group">
-        <button class="flex items-center focus:outline-none">
-          <img src="https://ui-avatars.com/api/?name=<%= user.name %>&background=random" alt="Avatar" class="w-8 h-8 rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 hidden group-hover:block">
-          <a href="/profile" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Mi Perfil</a>
-          <a href="/settings" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Configuración</a>
+      
+      <!-- Usuario y menú -->
+      <div class="flex items-center space-x-4">
+        <!-- Saludo desktop -->
+        <div class="hidden lg:block text-gray-600">
+          <span class="text-sm">Hola, </span>
+          <span class="font-semibold text-emerald-700"><%= user.name %></span>
+        </div>
+        
+        <!-- Avatar y dropdown -->
+        <div class="relative">
+          <button id="user-menu-btn" class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+            <img src="https://ui-avatars.com/api/?name=<%= user.name %>&background=10b981&color=ffffff&bold=true" alt="Avatar" class="w-8 h-8 rounded-full ring-2 ring-emerald-200">
+            <i class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-200" id="dropdown-arrow"></i>
+          </button>
           
+          <!-- Dropdown menu -->
+          <div id="user-dropdown" class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50 opacity-0 invisible transform scale-95 transition-all duration-200 origin-top-right">
+            <!-- User info en mobile -->
+            <div class="px-4 py-3 border-b border-gray-100 lg:hidden">
+              <p class="text-sm font-medium text-gray-800"><%= user.name %></p>
+              <p class="text-xs text-gray-500 truncate"><%= user.email %></p>
+            </div>
+            
+            <a href="/profile" class="flex items-center px-4 py-3 text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors duration-200">
+              <i class="fas fa-user-circle w-5 mr-3 text-gray-400"></i>
+              Mi Perfil
+            </a>
+            
+            
+            <div class="border-t border-gray-100 mt-2 pt-2">
+              <form action="/auth/logout" method="POST" class="block">
+                <button type="submit" class="flex items-center w-full px-4 py-3 text-red-600 hover:bg-red-50 transition-colors duration-200">
+                  <i class="fas fa-sign-out-alt w-5 mr-3"></i>
+                  Cerrar Sesión
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </nav>
 
-<div class="md:hidden bg-blue-500 text-white">
-  <div class="container mx-auto py-2 px-4 flex justify-around">
-    <a href="/dashboard" class="flex flex-col items-center <%= currentPage === 'dashboard' ? 'text-blue-200' : '' %>">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-      </svg>
-      <span class="text-xs">Inicio</span>
-    </a>
-    <a href="/projects" class="flex flex-col items-center <%= currentPage === 'projects' ? 'text-blue-200' : '' %>">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-      </svg>
-      <span class="text-xs">Proyectos</span>
-    </a>
-    <a href="/profile" class="flex flex-col items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
-      <span class="text-xs">Perfil</span>
-    </a>
+<!-- Navegación móvil -->
+<div class="md:hidden bg-white border-t border-gray-200 shadow-sm">
+  <div class="container mx-auto px-4 py-2">
+    <div class="flex justify-around">
+      <a href="/dashboard" class="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 <%= currentPage === 'dashboard' ? 'text-emerald-600 bg-emerald-50' : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50' %>">
+        <i class="fas fa-tachometer-alt text-lg mb-1"></i>
+        <span class="text-xs font-medium">Inicio</span>
+      </a>
+      
+      <a href="/projects" class="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 <%= currentPage === 'projects' ? 'text-emerald-600 bg-emerald-50' : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50' %>">
+        <i class="fas fa-project-diagram text-lg mb-1"></i>
+        <span class="text-xs font-medium">Proyectos</span>
+      </a>
+      
+      <a href="/profile" class="flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-200 <%= currentPage === 'profile' ? 'text-emerald-600 bg-emerald-50' : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50' %>">
+        <i class="fas fa-user-circle text-lg mb-1"></i>
+        <span class="text-xs font-medium">Perfil</span>
+      </a>
+    </div>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const userMenuBtn = document.getElementById('user-menu-btn');
+  const userDropdown = document.getElementById('user-dropdown');
+  const dropdownArrow = document.getElementById('dropdown-arrow');
+  
+  let isOpen = false;
+  
+  // Toggle dropdown
+  userMenuBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    toggleDropdown();
+  });
+  
+  // Cerrar dropdown al hacer clic fuera
+  document.addEventListener('click', function(e) {
+    if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+      closeDropdown();
+    }
+  });
+  
+  // Cerrar dropdown con Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && isOpen) {
+      closeDropdown();
+    }
+  });
+  
+  function toggleDropdown() {
+    if (isOpen) {
+      closeDropdown();
+    } else {
+      openDropdown();
+    }
+  }
+  
+  function openDropdown() {
+    isOpen = true;
+    userDropdown.classList.remove('opacity-0', 'invisible', 'scale-95');
+    userDropdown.classList.add('opacity-100', 'visible', 'scale-100');
+    dropdownArrow.style.transform = 'rotate(180deg)';
+  }
+  
+  function closeDropdown() {
+    isOpen = false;
+    userDropdown.classList.remove('opacity-100', 'visible', 'scale-100');
+    userDropdown.classList.add('opacity-0', 'invisible', 'scale-95');
+    dropdownArrow.style.transform = 'rotate(0deg)';
+  }
+});
+</script>

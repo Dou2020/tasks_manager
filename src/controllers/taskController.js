@@ -1,5 +1,6 @@
 const { Task, User, Comment, Project } = require('../models');
 const socketProvider = require('../io/socketProvider');
+const EmailService = require('../services/emailService');
 
 // Obtener todas las tareas de un proyecto
 const getProjectTasks = async (req, res) => {
@@ -60,6 +61,31 @@ const createTask = async (req, res) => {
       status: 'Por hacer',
       createdAt: new Date()
     });
+    
+    // Si hay un usuario asignado, enviar notificación por correo
+    if (assignedTo) {
+      try {
+        const assignedUser = await User.findByPk(assignedTo);
+        const project = await Project.findByPk(projectId);
+        const assigningUser = await User.findByPk(req.session.userId);
+        
+        if (assignedUser && assignedUser.email) {
+          await EmailService.sendTaskAssignmentNotification({
+            to: assignedUser.email,
+            assignedBy: assigningUser.name || assigningUser.username,
+            taskTitle: task.title,
+            projectName: project.name,
+            projectId: projectId,
+            taskId: task.id,
+            priority: priority,
+            dueDate: dueDate
+          });
+        }
+      } catch (emailError) {
+        console.error('Error al enviar notificación por correo:', emailError);
+        // No interrumpir el flujo si falla el correo
+      }
+    }
     
     // Cargar la tarea con el usuario asignado
     const taskWithDetails = await Task.findByPk(task.id, {
@@ -140,6 +166,9 @@ const updateTask = async (req, res) => {
       return res.status(404).json({ error: 'Tarea no encontrada' });
     }
     
+    // Guardar el estado original para comparar después
+    const originalAssignedTo = task.assignedTo;
+    
     // Validar que el usuario asignado (si se proporciona) existe
     if (assignedTo) {
       const assignedUser = await User.findByPk(assignedTo);
@@ -157,6 +186,31 @@ const updateTask = async (req, res) => {
     if (status) task.status = status;
     
     await task.save();
+    
+    // Enviar notificación por correo si se cambió la asignación
+    if (assignedTo !== undefined && assignedTo !== originalAssignedTo && assignedTo !== null) {
+      try {
+        const assignedUser = await User.findByPk(assignedTo);
+        const project = await Project.findByPk(task.projectId);
+        const assigningUser = await User.findByPk(req.session.userId);
+        
+        if (assignedUser && assignedUser.email) {
+          await EmailService.sendTaskAssignmentNotification({
+            to: assignedUser.email,
+            assignedBy: assigningUser.name || assigningUser.username,
+            taskTitle: task.title,
+            projectName: project.name,
+            projectId: task.projectId,
+            taskId: task.id,
+            priority: task.priority,
+            dueDate: task.dueDate
+          });
+        }
+      } catch (emailError) {
+        console.error('Error al enviar notificación por correo:', emailError);
+        // No interrumpir el flujo si falla el correo
+      }
+    }
     
     // Devolver la tarea actualizada con sus relaciones
     const updatedTask = await Task.findByPk(taskId, {
