@@ -6,43 +6,53 @@ const http = require('http');
 const socketIO = require('socket.io');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const { sequelize } = require('./src/models');
+const cookie = require('cookie');
+const cookieParser = require('cookie-parser');
+
 // Inicialización
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-// Middlewares
+// Creamos un módulo centralizado para socket.io
+const socketModule = {
+  io: io,
+  init: function(sessionMiddleware) {
+    require('./src/io/socket')(this.io, sessionMiddleware);
+    return this.io;
+  },
+  getIO: function() {
+    if (!this.io) {
+      throw new Error('Socket.IO not initialized!');
+    }
+    return this.io;
+  }
+};
+
+// Configuración de sesión y middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 const sessionStore = new SequelizeStore({ db: sequelize });
-app.use(session({
+
+const sessionMiddleware = session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   store: sessionStore,
   cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 día
-}));
+});
+
+app.use(sessionMiddleware);
 app.use(express.static(path.join(__dirname, 'public')));
 sessionStore.sync();
-
 
 // View engine
 app.set('views', path.join(__dirname, 'src/views'));
 app.set('view engine', 'ejs');
 
-// Socket.IO
-io.on('connection', (socket) => {
-  console.log(`⏳ Nuevo cliente conectado [id=${socket.id}]`);
-  socket.on('disconnect', () => {
-    console.log(`❌ Cliente desconectado [id=${socket.id}]`);
-  });
-  // Aquí podrás definir eventos personalizados...
-});
-
-
-// TODO: importar y usar routers de auth, projects, tasks...
-// const authRouter = require('./src/routes/auth');
-// app.use('/auth', authRouter);
+// Configuración de Socket.IO con autenticación
+socketModule.init(sessionMiddleware);
 
 // Import routes
 const authRoutes = require('./src/routes/auth');
@@ -85,3 +95,7 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
+
+// Exportar módulo de socket
+module.exports = app;
+module.exports.socketModule = socketModule;

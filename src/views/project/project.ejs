@@ -68,6 +68,20 @@
           <span class="text-gray-600">Miembros:</span>
           <span class="font-semibold"><%= project.members ? project.members.length : 0 %></span>
         </div>
+        
+        <!-- Indicador de usuarios conectados -->
+        <div class="ml-auto">
+          <div class="flex items-center">
+            <span class="text-gray-600 mr-2">En línea:</span>
+            <div id="online-users" class="flex flex-wrap items-center">
+              <div class="animate-pulse flex">
+                <div class="h-2 w-2 bg-gray-300 rounded-full mr-1"></div>
+                <div class="h-2 w-16 bg-gray-300 rounded"></div>
+              </div>
+            </div>
+            <div id="connection-status-inline" class="ml-2 text-xs"></div>
+          </div>
+        </div>
       </div>
       
       <div class="mt-4">
@@ -203,12 +217,20 @@
     const projectId = '<%= project.id %>';
     const isOwner = <%= isOwner %>;
   </script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/socket-client.js"></script>
   <script src="/js/project.js"></script>
   <script src="/js/tasks.js"></script>
   <script>
     // Inicializar el gestor de tareas cuando el DOM esté listo
     document.addEventListener('DOMContentLoaded', function() {
       window.taskManager = new TaskManager(projectId);
+      
+      // Inicializar Socket.IO
+      window.socketClient = new SocketClient({
+        showNotifications: true,
+        showConnectionStatus: true
+      }).connect(projectId);
     });
   </script>
 </body>

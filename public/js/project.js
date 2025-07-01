@@ -297,4 +297,151 @@ document.addEventListener('DOMContentLoaded', function() {
     div.textContent = str;
     return div.innerHTML;
   }
+
+  // Configuración de Socket.IO para actualizaciones en tiempo real
+  setupSocketIO();
+  
+  // Función para configurar Socket.IO
+  function setupSocketIO() {
+    // Verificar si Socket.IO está disponible
+    if (typeof io === 'undefined') {
+      console.warn('Socket.IO no está disponible');
+      return;
+    }
+    
+    // Conectar al servidor Socket.IO
+    const socket = io();
+    
+    // Manejar errores de conexión
+    socket.on('connect_error', (error) => {
+      console.error('Error de conexión con Socket.IO:', error);
+    });
+    
+    // Cuando la conexión está lista
+    socket.on('connect', () => {
+      console.log('Conectado a Socket.IO');
+      
+      // Unirse a la sala del proyecto actual
+      socket.emit('join-project', projectId);
+    });
+    
+    // Confirmar unión a proyecto
+    socket.on('joined-project', (data) => {
+      console.log(`Unido al proyecto ${data.projectId} para actualizaciones en tiempo real`);
+    });
+    
+    // Eventos de tareas
+    
+    // Nueva tarea creada
+    socket.on('task-created', (task) => {
+      console.log('Nueva tarea creada:', task);
+      
+      // Recargar solo la columna correspondiente
+      if (window.taskManager) {
+        window.taskManager.loadTasks();
+      } else {
+        loadTasks();  // Función legacy
+      }
+    });
+    
+    // Tarea actualizada
+    socket.on('task-updated', (task) => {
+      console.log('Tarea actualizada:', task);
+      
+      // Recargar solo la columna correspondiente
+      if (window.taskManager) {
+        window.taskManager.loadTasks();
+      } else {
+        loadTasks();  // Función legacy
+      }
+    });
+    
+    // Tarea eliminada
+    socket.on('task-deleted', (data) => {
+      console.log('Tarea eliminada:', data.id);
+      
+      // Recargar tareas
+      if (window.taskManager) {
+        window.taskManager.loadTasks();
+      } else {
+        loadTasks();  // Función legacy
+      }
+    });
+    
+    // Nuevo comentario
+    socket.on('comment-added', (data) => {
+      console.log('Comentario agregado a tarea:', data);
+      
+      // Si el modal de detalles de tarea está abierto y es la misma tarea
+      if (window.taskManager && 
+          window.taskManager.currentTaskId === data.taskId && 
+          !window.taskManager.taskDetailModal.classList.contains('hidden')) {
+        window.taskManager.loadComments(data.taskId);
+      }
+    });
+    
+    // Forzar recarga de tareas
+    socket.on('refresh-tasks', () => {
+      console.log('Forzando recarga de tareas...');
+      if (window.taskManager) {
+        window.taskManager.loadTasks();
+      } else {
+        loadTasks();  // Función legacy
+      }
+    });
+  }
+  
+  // Añadir botón de recarga manual y reconexión
+  const onlineUsersContainer = document.getElementById('online-users');
+  if (onlineUsersContainer) {
+    const controlsDiv = document.createElement('div');
+    controlsDiv.className = "flex items-center ml-2";
+    
+    // Botón de refrescar datos
+    const refreshButton = document.createElement('button');
+    refreshButton.className = "text-xs text-blue-600 hover:text-blue-800 mr-2";
+    refreshButton.title = "Refrescar datos";
+    refreshButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+    </svg>`;
+    refreshButton.addEventListener('click', function() {
+      if (window.socketClient) {
+        window.socketClient.refreshData();
+      }
+    });
+    
+    // Botón de reconexión
+    const reconnectButton = document.createElement('button');
+    reconnectButton.className = "text-xs text-green-600 hover:text-green-800";
+    reconnectButton.title = "Forzar reconexión";
+    reconnectButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>`;
+    reconnectButton.addEventListener('click', function() {
+      if (window.socketClient) {
+        window.socketClient.reconnect();
+      }
+    });
+    
+    controlsDiv.appendChild(refreshButton);
+    controlsDiv.appendChild(reconnectButton);
+    
+    const parentDiv = onlineUsersContainer.parentElement;
+    parentDiv.appendChild(controlsDiv);
+  }
+  
+  // Inicializar Socket.IO con verificación
+  window.addEventListener('load', function() {
+    // Verificar si tenemos un socket client inicializado
+    if (window.socketClient) {
+      // Asegurarnos de que está conectado al proyecto correcto
+      if (window.socketClient.projectId != projectId) {
+        console.log('Detectado cambio de proyecto, actualizando conexión');
+        window.socketClient.joinProject(projectId);
+      } else if (!window.socketClient.isConnected) {
+        console.log('Socket client no conectado, reconectando');
+        window.socketClient.reconnect();
+      }
+    }
+  });
 });

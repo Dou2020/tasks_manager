@@ -1,4 +1,5 @@
 const { Task, User, Comment, Project } = require('../models');
+const socketProvider = require('../io/socketProvider');
 
 // Obtener todas las tareas de un proyecto
 const getProjectTasks = async (req, res) => {
@@ -70,6 +71,18 @@ const createTask = async (req, res) => {
         }
       ]
     });
+    
+    // Emitir evento de Socket.IO
+    try {
+      const io = socketProvider.getIO();
+      if (io) {
+        console.log(`Emitiendo evento task-created para proyecto ${projectId}`);
+        const roomName = `project-${projectId}`;
+        io.to(roomName).emit('task-created', taskWithDetails);
+      }
+    } catch (socketError) {
+      console.error('Error al emitir evento socket:', socketError);
+    }
     
     res.status(201).json(taskWithDetails);
   } catch (error) {
@@ -156,6 +169,18 @@ const updateTask = async (req, res) => {
       ]
     });
     
+    // Emitir evento de Socket.IO
+    try {
+      const io = socketProvider.getIO();
+      if (io) {
+        console.log(`Emitiendo evento task-updated para proyecto ${task.projectId}`);
+        const roomName = `project-${task.projectId}`;
+        io.to(roomName).emit('task-updated', updatedTask);
+      }
+    } catch (socketError) {
+      console.error('Error al emitir evento socket:', socketError);
+    }
+    
     res.json(updatedTask);
   } catch (error) {
     console.error('Error al actualizar tarea:', error);
@@ -181,6 +206,22 @@ const updateTaskStatus = async (req, res) => {
     task.status = status;
     await task.save();
     
+    // Emitir evento de Socket.IO
+    try {
+      const io = socketProvider.getIO();
+      if (io) {
+        const updatedTask = await Task.findByPk(taskId, {
+          include: [{ model: User, as: 'assignee', attributes: ['id', 'name', 'username'] }]
+        });
+        
+        console.log(`Emitiendo evento task-updated (status) para proyecto ${task.projectId}`);
+        const roomName = `project-${task.projectId}`;
+        io.to(roomName).emit('task-updated', updatedTask);
+      }
+    } catch (socketError) {
+      console.error('Error al emitir evento socket:', socketError);
+    }
+    
     res.json({ id: task.id, status: task.status });
   } catch (error) {
     console.error('Error al actualizar estado:', error);
@@ -198,7 +239,21 @@ const deleteTask = async (req, res) => {
       return res.status(404).json({ error: 'Tarea no encontrada' });
     }
     
+    const projectId = task.projectId; // Guardar el projectId antes de eliminar
+    
     await task.destroy();
+    
+    // Emitir evento de Socket.IO
+    try {
+      const io = socketProvider.getIO();
+      if (io) {
+        console.log(`Emitiendo evento task-deleted para proyecto ${projectId}`);
+        const roomName = `project-${projectId}`;
+        io.to(roomName).emit('task-deleted', { id: taskId });
+      }
+    } catch (socketError) {
+      console.error('Error al emitir evento socket:', socketError);
+    }
     
     res.json({ message: 'Tarea eliminada exitosamente' });
   } catch (error) {
@@ -242,6 +297,18 @@ const addComment = async (req, res) => {
         }
       ]
     });
+    
+    // Emitir evento de Socket.IO
+    try {
+      const io = socketProvider.getIO();
+      if (io) {
+        console.log(`Emitiendo evento comment-added para proyecto ${task.projectId} y tarea ${taskId}`);
+        const roomName = `project-${task.projectId}`;
+        io.to(roomName).emit('comment-added', { taskId, comment: commentWithAuthor });
+      }
+    } catch (socketError) {
+      console.error('Error al emitir evento socket:', socketError);
+    }
     
     res.status(201).json(commentWithAuthor);
   } catch (error) {
