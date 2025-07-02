@@ -1,183 +1,258 @@
-# tasks_manager
+# Task Manager
 
-# 🗂️ Task Manager API
+Task Manager es una aplicación web colaborativa para la gestión de proyectos y tareas, inspirada en herramientas como Trello. Permite a los equipos organizarse, asignar responsabilidades y realizar seguimiento de actividades en tiempo real.
 
-Una API RESTful segura para la gestión de usuarios y tareas, construida con **Node.js**, **Express**, **Sequelize** y **JWT**.
+![Task Manager Screenshot](docs/images/screenshot.png)
 
----
+## Características
 
-## 📦 Requisitos Previos
+- 📋 Organización de tareas en tableros Kanban (Por hacer, En progreso, Completado)
+- 👥 Gestión de equipos y colaboradores
+- 📱 Interfaz responsiva adaptada a dispositivos móviles y escritorio
+- ⚡ Actualizaciones en tiempo real mediante Socket.IO
+- 📧 Notificaciones por correo electrónico
+- 🔄 Arrastrar y soltar tareas entre columnas
+- 🔔 Sistema de notificaciones integrado
+- 🔒 Sistema de autenticación y gestión de permisos
 
-- Node.js >= 16.x
-- npm >= 8.x
-- MySQL o MariaDB
-- Git (opcional)
+## Tecnologías
 
----
+- **Backend**: Node.js, Express
+- **Frontend**: HTML, CSS, JavaScript, Tailwind CSS
+- **Vistas**: EJS (Embedded JavaScript)
+- **Base de datos**: SQL Server (MSSQL)
+- **ORM**: Sequelize
+- **Tiempo Real**: Socket.IO
+- **Email**: Nodemailer
+- **Autenticación**: Express-session, bcrypt
 
-## ⚙️ Configuración Inicial
+## Instalación
 
-### 1. Clonar el repositorio
+### Requisitos previos
+
+- Node.js (v14+)
+- SQL Server
+- Git
+
+### Paso 1: Clonar el repositorio
 
 ```bash
-git clone https://github.com/tu-usuario/task_manager.git
-cd task_manager
+git clone https://github.com/your-username/task-manager.git
+cd task-manager
 ```
 
-### 2. Instalar dependencias
+### Paso 2: Instalar dependencias
 
 ```bash
 npm install
 ```
 
----
+### Paso 3: Configurar la base de datos
 
-## 🛠️ Configuración de entorno
+Crear una nueva base de datos en SQL Server:
 
-Crea un archivo `.env` en la raíz del proyecto:
+```sql
+CREATE DATABASE task_manager;
+```
+
+Crear un usuario con permisos o usar un usuario existente:
+
+```sql
+USE task_manager;
+CREATE LOGIN task_user WITH PASSWORD = 'your_password';
+CREATE USER task_user FOR LOGIN task_user;
+EXEC sp_addrolemember 'db_owner', 'task_user';
+```
+
+### Paso 4: Configurar variables de entorno
+
+Copia el archivo `.env.example` a `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-Edita los valores del `.env` según tu configuración local:
+Edita el archivo `.env` con tus configuraciones:
 
 ```env
+# Server
 PORT=3000
 NODE_ENV=development
 
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=task_manager_db
-DB_USER=tu_usuario
-DB_PASSWORD=tu_contraseña
+# Database (MSSQL)
+DB_HOST=your_server_name_or_ip
+DB_PORT=1433
+DB_NAME=task_manager
+DB_USER=task_user
+DB_PASS=your_password
+DB_DIALECT=mssql
 
-JWT_SECRET=tu_secreto
-JWT_REFRESH_SECRET=tu_refresh_secreto
-JWT_EXPIRES_IN=15m
-JWT_REFRESH_EXPIRES_IN=7d
+# Session
+SESSION_SECRET=generate_a_random_string_here
+
+# Email 
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+APP_URL=http://localhost:3000
 ```
 
----
+> **Nota:** Para Gmail, necesitarás generar una "Contraseña de aplicación" desde la configuración de seguridad de tu cuenta de Google.
 
-## 🧾 Configurar la base de datos
+### Paso 5: Ejecutar migraciones de base de datos
 
-### 1. Crear la base de datos MSSQL SERVER
-
-```sql
-CREATE DATABASE task_manager_db 
-```
-
-> 💡 Asegúrate de que el usuario y contraseña coincidan con los valores de tu `.env`.
-
----
-
-## 📂 Estructura del proyecto
-
-```
-task_manager/
-├── src/
-│   ├── config/
-│   │   └── server.js
-│   ├── controllers/
-│   │   └── auth.controller.js
-│   ├── middleware/
-│   │   └── security.middleware.js
-│   ├── models/
-│   │   ├── index.js
-│   │   └── User.js
-│   ├── routes/
-│   │   └── auth.routes.js
-│   ├── validators/
-│   │   └── auth.validator.js
-│   └── public/
-│       ├── register.html
-│       ├── login.html
-│       └── home.html
-├── migrations/
-├── .env
-├── .gitignore
-├── package.json
-└── README.md
-```
-
----
-
-## 📤 Ejecutar migraciones
-
-Asegúrate de tener configurado Sequelize CLI.
+Ejecuta el siguiente comando para crear las tablas necesarias en la base de datos:
 
 ```bash
 npm run db:migrate
 ```
 
-Si no tienes `sequelize-cli` instalado globalmente:
+Opcionalmente, puedes cargar datos de prueba:
 
 ```bash
-npm install --save-dev sequelize-cli
+npm run db:seed
 ```
 
----
+### Paso 6: Iniciar la aplicación
 
-## 🚀 Levantar el servidor
+Modo desarrollo con recarga automática:
 
 ```bash
 npm run dev
 ```
 
-> Abre tu navegador en: [http://localhost:3000](http://localhost:3000)
-
----
-
-## 🔐 Endpoints disponibles
-
-| Método | Ruta                    | Protegido | Descripción                         |
-|--------|-------------------------|-----------|-------------------------------------|
-| POST   | `/api/auth/register`    | ❌        | Registro de usuario                 |
-| POST   | `/api/auth/login`       | ❌        | Inicio de sesión                    |
-| POST   | `/api/auth/logout`      | ✅        | Cierra sesión                       |
-| GET    | `/api/auth/profile`     | ✅        | Perfil del usuario autenticado      |
-| GET    | `/api/auth/verify-token`| ✅        | Verifica si el token aún es válido  |
-| POST   | `/api/auth/refresh-token` | ❌     | Renueva el token de acceso         |
-
----
-
-## 📄 Notas adicionales
-
-- El sistema usa JWT (access y refresh tokens).
-- Seguridad incluida: Rate limiting, helmet, CORS estricto, XSS protection, HPP, validaciones y sanitización.
-- Los formularios HTML están disponibles en `public/`.
-
----
-
-## 📚 Scripts útiles
+Modo producción:
 
 ```bash
-# Ejecutar en desarrollo
-npm run dev
+npm start
+```
 
-# Ejecutar migraciones
-npx sequelize-cli db:migrate
+La aplicación estará disponible en: [http://localhost:3000](http://localhost:3000)
 
-# Crear una nueva migración
-npx sequelize-cli migration:generate --name nombre_migracion
+---
 
-# Revertir última migración
-npx sequelize-cli db:migrate:undo
+### Estructura del Proyecto
+
+```
+task_manager/
+│
+├── public/             # Archivos estáticos (JS, CSS, imágenes)
+│   ├── css/
+│   ├── js/
+│   └── images/
+│
+├── src/
+│   ├── config/         # Configuraciones (DB, email)
+│   ├── controllers/    # Controladores
+│   ├── io/             # Configuración y eventos Socket.IO
+│   ├── middlewares/    # Middlewares Express
+│   ├── models/         # Modelos Sequelize
+│   ├── routes/         # Rutas Express
+│   ├── services/       # Servicios (email, etc.)
+│   └── views/          # Plantillas EJS
+│       ├── auth/
+│       ├── partials/
+│       ├── project/
+│       └── user/
+
+├── app.js              # Punto de entrada
+├── sequelize.config.js # Configuración de Sequelize
+└── package.json
 ```
 
 ---
 
-## 🧪 Testeo rápido con curl
+### API REST
 
-```bash
-curl -X POST http://localhost:3000/api/auth/register \
- -H "Content-Type: application/json" \
- -d '{"username":"usuario1","email":"correo@example.com","password":"Test1234","confirmPassword":"Test1234"}'
-```
+**Autenticación**
+- `POST /auth/register` - Registrar un nuevo usuario  
+- `POST /auth/login` - Iniciar sesión  
+- `POST /auth/logout` - Cerrar sesión  
+
+**Proyectos**
+- `GET /projects` - Listar proyectos  
+- `GET /projects/:id/view` - Ver un proyecto  
+- `GET /projects/api/list` - API para listar proyectos  
+- `GET /projects/api/:id` - API para obtener datos de un proyecto  
+- `POST /projects` - Crear un proyecto  
+- `POST /projects/:id/invite` - Invitar usuario a un proyecto  
+
+**Tareas**
+- `GET /projects/:projectId/tasks` - Listar tareas de un proyecto  
+- `POST /projects/:projectId/tasks` - Crear una tarea  
+- `GET /tasks/:id` - Obtener detalles de una tarea  
+- `PUT /tasks/:id` - Actualizar una tarea  
+- `PATCH /tasks/:id/status` - Actualizar solo el estado de una tarea  
+- `DELETE /tasks/:id` - Eliminar una tarea  
+
+**Comentarios**
+- `GET /tasks/:id/comments` - Obtener comentarios de una tarea  
+- `POST /tasks/:id/comments` - Añadir comentario a una tarea  
 
 ---
 
-## 📝 Licencia
+### Eventos Socket.IO
 
-Este proyecto está licenciado bajo la MIT License.
+**Cliente → Servidor**
+- `join-project` - Unirse a un proyecto para recibir actualizaciones  
+- `heartbeat` - Verificación periódica de conexión activa  
+- `request-refresh` - Solicitud para actualizar datos  
+- `request-online-users` - Solicitar lista de usuarios en línea  
+
+**Servidor → Cliente**
+- `joined-project` - Confirmación de unión a un proyecto  
+- `user-joined` - Notificación cuando otro usuario se une  
+- `online-users` - Lista actualizada de usuarios en línea  
+- `task-created` - Nueva tarea creada  
+- `task-updated` - Tarea actualizada  
+- `task-deleted` - Tarea eliminada  
+- `comment-added` - Nuevo comentario añadido  
+- `refresh-tasks` - Solicitud para recargar las tareas  
+
+---
+
+### Seguridad
+
+- Autenticación de usuarios con sesiones  
+- Contraseñas cifradas con bcrypt  
+- Control de acceso basado en roles (propietario vs. miembro)  
+- Validación de datos de entrada  
+- Protección contra XSS  
+
+---
+
+### Solución de problemas
+
+**Error de conexión a la base de datos**  
+- Asegúrate de que SQL Server está en ejecución  
+- Verifica las credenciales en `.env`  
+- Confirma que el puerto coincide con el de tu servidor SQL  
+- Revisa que el usuario tenga permisos suficientes  
+
+**Los correos no se envían**  
+- Verifica la configuración SMTP en `.env`  
+- Si usas Gmail, usa una "Contraseña de aplicación"  
+- Consulta los logs del servidor  
+
+**No se actualizan los datos en tiempo real**  
+- Comprueba la conexión Socket.IO en la consola del navegador  
+- Revisa errores en la consola del servidor  
+- Asegura que el cliente esté unido al proyecto  
+
+---
+
+### Contribuir
+
+1. Haz un fork del repositorio  
+2. Crea una rama para tu funcionalidad (`git checkout -b feature/amazing-feature`)  
+3. Haz commit de tus cambios (`git commit -m 'Add some amazing feature'`)  
+4. Sube la rama (`git push origin feature/amazing-feature`)  
+5. Abre un Pull Request  
+
+---
+
+### Licencia
+
+Este proyecto está licenciado bajo la Licencia MIT.  
