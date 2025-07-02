@@ -39,7 +39,7 @@ jobs:
         with:
           project: ${{ github.repository }}
           path: '.'                    # Escanea todo el repo
-          format: 'HTML,SARIF'
+          format: 'ALL'                # Genera todos los formatos de reporte
           args: >
             --failOnCVSS 7             # Falla si CVSS ≥ 7
             --enableRetired
