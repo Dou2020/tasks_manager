@@ -1,0 +1,61 @@
+name: CI Security Deploy to Render
+
+on:
+  push:
+    branches: [main]          # Despliega sólo cuando haces push a main
+  pull_request:               # Corre los chequeos de seguridad en PR
+    branches: [main]
+
+jobs:
+  test-security-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Obtener el código
+      - uses: actions/checkout@v4
+
+      # 2) Configurar Node.js
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3) Instalar dependencias exactamente como en CI
+      - run: npm ci
+
+      # 4) Pruebas unitarias y de estilo (opcional, ajusta a tu proyecto)
+      - run: npm test --if-present
+      - run: npm run lint --if-present
+
+      # 5) Auditoría de dependencias con npm
+      - name: NPM Audit (falla si hay CVE ≥ high)
+        run: npm audit --audit-level=high
+
+      # 6) Análisis SCA con OWASP Dependency‑Check
+      - name: OWASP Dependency-Check
+        id: depcheck
+        uses: dependency-check/Dependency-Check_Action@main   # Acción oficial
+        with:
+          project: ${{ github.repository }}
+          path: '.'                    # Escanea todo el repo
+          format: 'HTML,SARIF'
+          args: >
+            --failOnCVSS 7             # Falla si CVSS ≥ 7
+            --enableRetired
+
+      # 7) Publicar el reporte como artefacto de workflow
+      - name: Subir reporte Dep-Check
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: reports                # Carpeta por defecto del paso anterior
+
+      # 8) Despliegue a Render (sólo en push directo a main)
+      - name: Deploy to Render
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
+          api-key:    ${{ secrets.RENDER_API_KEY }}
+          wait-for-success: true       # Espera hasta que Render marque la deploy como live
