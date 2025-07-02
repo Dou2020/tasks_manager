@@ -54,8 +54,5 @@ jobs:
       # 8) Despliegue a Render (sólo en push directo a main)
       - name: Deploy to Render
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: johnbeynon/render-deploy-action@v0.0.8
-        with:
-          service-id: ${{ secrets.RENDER_SERVICE_ID }}
-          api-key:    ${{ secrets.RENDER_API_KEY }}
-          wait-for-success: true       # Espera hasta que Render marque la deploy como live
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
