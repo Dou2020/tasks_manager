@@ -2,6 +2,7 @@
  * Gestor de Tareas Mejorado
  * Script para manejar la interacción con tareas en el proyecto
  * Incluye funcionalidad de Drag & Drop y mejores cards de tareas
+ * CORREGIDO: Event listeners dinámicos para tareas nuevas
  */
 
 class TaskManager {
@@ -115,6 +116,13 @@ class TaskManager {
       column.addEventListener('dragenter', this.handleDragEnter.bind(this));
       column.addEventListener('dragleave', this.handleDragLeave.bind(this));
     });
+  }
+
+  // NUEVO: Configurar event listeners para una tarea específica
+  setupTaskEventListeners(taskCard) {
+    // Configurar drag and drop
+    taskCard.addEventListener('dragstart', this.handleDragStart.bind(this));
+    taskCard.addEventListener('dragend', this.handleDragEnd.bind(this));
   }
 
   handleDragStart(e) {
@@ -279,6 +287,9 @@ class TaskManager {
     tasks.forEach((task, index) => {
       const taskCard = this.createTaskCard(task, index);
       container.appendChild(taskCard);
+      
+      // IMPORTANTE: Configurar event listeners para cada tarea nueva
+      this.setupTaskEventListeners(taskCard);
     });
   }
 
@@ -304,9 +315,7 @@ class TaskManager {
     taskCard.dataset.taskId = task.id;
     taskCard.draggable = true;
 
-    // Configurar eventos de drag and drop
-    taskCard.addEventListener('dragstart', this.handleDragStart.bind(this));
-    taskCard.addEventListener('dragend', this.handleDragEnd.bind(this));
+    // NOTA: Los event listeners se configuran en renderTasks() después de crear la card
 
     taskCard.innerHTML = `
       <!-- Encabezado de la tarea -->
@@ -604,7 +613,7 @@ class TaskManager {
       
       // Cerrar modal y recargar tareas
       this.closeTaskModal();
-      this.loadTasks();
+      await this.loadTasks(); // IMPORTANTE: Esperar a que se recarguen las tareas
       this.showNotification(
         this.isEditing ? 'Tarea actualizada correctamente' : 'Tarea creada correctamente', 
         'success'
