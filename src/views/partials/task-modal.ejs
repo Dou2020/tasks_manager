@@ -1,91 +1,156 @@
 <div id="task-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-  <div class="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold" id="task-modal-title">Detalles de la Tarea</h3>
-      <button class="close-task-modal text-gray-500 hover:text-gray-700">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
-    
-    <form id="task-detail-form">
-      <input type="hidden" id="task-id" name="id">
-      
-      <!-- Campo título -->
-      <div class="mb-4">
-        <label for="detail-title" class="block text-sm font-medium text-gray-700 mb-1">Título</label>
-        <input type="text" name="title" id="detail-title" required class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
-      </div>
-      
-      <!-- Campo descripción -->
-      <div class="mb-4">
-        <label for="detail-description" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-        <textarea name="description" id="detail-description" rows="3" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500"></textarea>
-      </div>
-      
-      <!-- Estado -->
-      <div class="mb-4">
-        <label for="detail-status" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-        <select name="status" id="detail-status" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
-          <option value="Por hacer">Por hacer</option>
-          <option value="En progreso">En progreso</option>
-          <option value="Completado">Completado</option>
-        </select>
-      </div>
-      
-      <!-- Asignado a -->
-      <div class="mb-4">
-        <label for="detail-assignedTo" class="block text-sm font-medium text-gray-700 mb-1">Asignar a</label>
-        <select name="assignedTo" id="detail-assignedTo" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
-          <option value="">Sin asignar</option>
-          <!-- Opciones cargadas dinámicamente -->
-        </select>
-      </div>
-      
-      <!-- Campos adicionales en una fila -->
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <label for="detail-priority" class="block text-sm font-medium text-gray-700 mb-1">Prioridad</label>
-          <select name="priority" id="detail-priority" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
-            <option value="Baja">Baja</option>
-            <option value="Media">Media</option>
-            <option value="Alta">Alta</option>
-          </select>
-        </div>
-        <div>
-          <label for="detail-dueDate" class="block text-sm font-medium text-gray-700 mb-1">Fecha límite</label>
-          <input type="date" name="dueDate" id="detail-dueDate" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
-        </div>
-      </div>
-      
-      <!-- Botones de acción -->
+  <div class="bg-white rounded-xl shadow-2xl p-0 w-full max-w-2xl max-h-[90vh] overflow-hidden">
+    <!-- Header del modal -->
+    <div class="bg-gradient-to-r from-emerald-600 to-emerald-700 px-6 py-4">
       <div class="flex justify-between items-center">
-        <button type="button" id="delete-task-btn" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded hidden">
-          Eliminar Tarea
-        </button>
-        <div class="flex space-x-2">
-          <button type="button" class="close-task-modal py-2 px-4 border rounded hover:bg-gray-100">Cancelar</button>
-          <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Guardar</button>
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+            <i class="fas fa-tasks text-white text-sm"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white" id="task-modal-title">Detalles de la Tarea</h3>
         </div>
-      </div>
-    </form>
-    
-    <!-- Sección de comentarios -->
-    <div class="mt-8 pt-4 border-t" id="task-comments-section">
-      <h4 class="font-semibold mb-4 flex items-center justify-between">
-        <span>Comentarios</span>
-        <button id="toggle-comments" class="text-sm text-blue-600 hover:underline flex items-center">
-          <span class="mr-1">Mostrar</span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        <button class="close-task-modal text-white hover:text-gray-200 transition-colors duration-200 p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-      </h4>
+      </div>
+    </div>
+    
+    <!-- Contenido del modal -->
+    <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+      <form id="task-detail-form" class="space-y-6">
+        <input type="hidden" id="task-id" name="id">
+        
+        <!-- Campo título -->
+        <div class="space-y-2">
+          <label for="detail-title" class="block text-sm font-semibold text-gray-700">
+            <i class="fas fa-heading text-emerald-600 mr-2"></i>
+            Título
+          </label>
+          <input type="text" 
+                 name="title" 
+                 id="detail-title" 
+                 required 
+                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white">
+        </div>
+        
+        <!-- Campo descripción -->
+        <div class="space-y-2">
+          <label for="detail-description" class="block text-sm font-semibold text-gray-700">
+            <i class="fas fa-align-left text-emerald-600 mr-2"></i>
+            Descripción
+          </label>
+          <textarea name="description" 
+                    id="detail-description" 
+                    rows="4" 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white resize-none"
+                    placeholder="Describe los detalles de la tarea..."></textarea>
+        </div>
+        
+        <!-- Estado -->
+        <div class="space-y-2">
+          <label for="detail-status" class="block text-sm font-semibold text-gray-700">
+            <i class="fas fa-flag text-emerald-600 mr-2"></i>
+            Estado
+          </label>
+          <select name="status" 
+                  id="detail-status" 
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white">
+            <option value="Por hacer">📋 Por hacer</option>
+            <option value="En progreso">⚡ En progreso</option>
+            <option value="Completado">✅ Completado</option>
+          </select>
+        </div>
+        
+        <!-- Asignado a -->
+        <div class="space-y-2">
+          <label for="detail-assignedTo" class="block text-sm font-semibold text-gray-700">
+            <i class="fas fa-user-tag text-emerald-600 mr-2"></i>
+            Asignar a
+          </label>
+          <select name="assignedTo" 
+                  id="detail-assignedTo" 
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white">
+            <option value="">👤 Sin asignar</option>
+            <!-- Opciones cargadas dinámicamente -->
+          </select>
+        </div>
+        
+        <!-- Campos adicionales en grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label for="detail-priority" class="block text-sm font-semibold text-gray-700">
+              <i class="fas fa-exclamation-triangle text-emerald-600 mr-2"></i>
+              Prioridad
+            </label>
+            <select name="priority" 
+                    id="detail-priority" 
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white">
+              <option value="Baja">🟢 Baja</option>
+              <option value="Media">🟡 Media</option>
+              <option value="Alta">🔴 Alta</option>
+            </select>
+          </div>
+          <div class="space-y-2">
+            <label for="detail-dueDate" class="block text-sm font-semibold text-gray-700">
+              <i class="fas fa-calendar-alt text-emerald-600 mr-2"></i>
+              Fecha límite
+            </label>
+            <input type="date" 
+                   name="dueDate" 
+                   id="detail-dueDate" 
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white">
+          </div>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div class="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0 pt-4 border-t border-gray-200">
+          <button type="button" 
+                  id="delete-task-btn" 
+                  class="bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg hidden flex items-center space-x-2">
+            <i class="fas fa-trash-alt"></i>
+            <span>Eliminar Tarea</span>
+          </button>
+          <div class="flex space-x-3">
+            <button type="button" 
+                    class="close-task-modal py-3 px-6 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-all duration-200 text-gray-700">
+              Cancelar
+            </button>
+            <button type="submit" 
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-6 rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg flex items-center space-x-2">
+              <i class="fas fa-save"></i>
+              <span>Guardar Cambios</span>
+            </button>
+          </div>
+        </div>
+      </form>
       
-      <div id="comments-container" class="hidden">
-        <!-- Aquí se cargan los comentarios -->
-        <%- include('./comments') %>
+      <!-- Sección de comentarios -->
+      <div class="mt-8 pt-6 border-t border-gray-200" id="task-comments-section">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="font-bold text-lg text-gray-800 flex items-center">
+            <i class="fas fa-comments text-emerald-600 mr-2"></i>
+            Comentarios
+          </h4>
+          <button id="toggle-comments" 
+                  class="text-sm text-emerald-600 hover:text-emerald-700 font-medium flex items-center space-x-1 bg-emerald-50 px-3 py-2 rounded-lg hover:bg-emerald-100 transition-all duration-200">
+            <span id="toggle-text">Mostrar</span>
+            <svg xmlns="http://www.w3.org/2000/svg" 
+                 class="h-4 w-4 transition-transform duration-200" 
+                 id="toggle-arrow"
+                 fill="none" 
+                 viewBox="0 0 24 24" 
+                 stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+        </div>
+        
+        <div id="comments-container" class="hidden">
+          <!-- Aquí se cargan los comentarios -->
+          <%- include('./comments') %>
+        </div>
       </div>
     </div>
   </div>
