@@ -223,6 +223,17 @@ task_manager/
 
 ---
 
+### Tests
+Asegurese de tener las dependecias instaladas
+```
+npm install
+```
+Para ejecutar los tests:
+```
+npm test
+```
+
+---
 ### Solución de problemas
 
 **Error de conexión a la base de datos**  
