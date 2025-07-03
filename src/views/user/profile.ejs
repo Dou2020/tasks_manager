@@ -7,121 +7,352 @@
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-50 min-h-screen">
   <% const currentPage = 'profile'; %>
   <%- include('../partials/navbar', { user, currentPage }) %>
 
-  <div class="container mx-auto p-4">
-    <h1 class="text-3xl font-bold mb-6 text-center">Mi Perfil</h1>
-
-    <!-- Información del perfil -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-      <div class="flex items-center mb-6">
-        <div class="mr-6">
-          <img src="https://ui-avatars.com/api/?name=<%= user.name %>&size=128&background=random" alt="Avatar" class="w-32 h-32 rounded-full border-4 border-white shadow-lg">
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Header de la página -->
+    <div class="text-center mb-8">
+      <div class="flex items-center justify-center space-x-3 mb-2">
+        <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center">
+          <i class="fas fa-user-circle text-white"></i>
         </div>
-        <div>
-          <h2 class="text-2xl font-semibold"><%= user.name %></h2>
-          <p class="text-gray-600">@<%= user.username %></p>
-          <p class="text-gray-500 mt-1">Miembro desde <%= new Date(user.createdAt).toLocaleDateString() %></p>
+        <h1 class="text-3xl font-bold text-gray-800">Mi Perfil</h1>
+      </div>
+      <p class="text-gray-600">Gestiona tu información personal y configuración de cuenta</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Sidebar con información del usuario -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+          <!-- Header del perfil -->
+          <div class="bg-gradient-to-br from-emerald-600 to-emerald-700 px-6 py-8 text-center">
+            <div class="relative inline-block mb-4">
+              <img src="https://ui-avatars.com/api/?name=<%= user.name %>&size=128&background=ffffff&color=10b981&bold=true" 
+                   alt="Avatar" 
+                   class="w-24 h-24 rounded-full border-4 border-white shadow-lg mx-auto">
+              <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-3 border-white flex items-center justify-center">
+                <i class="fas fa-check text-white text-xs"></i>
+              </div>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-1"><%= user.name %></h2>
+            <p class="text-emerald-100 text-sm">@<%= user.username %></p>
+          </div>
+          
+          <!-- Información adicional -->
+          <div class="px-6 py-4">
+            <div class="space-y-4">
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-envelope w-4 mr-3 text-emerald-600"></i>
+                <span class="truncate"><%= user.email %></span>
+              </div>
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-calendar-plus w-4 mr-3 text-emerald-600"></i>
+                <span>Miembro desde <%= new Date(user.createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+              </div>
+              <div class="flex items-center text-sm text-gray-600">
+                <i class="fas fa-shield-alt w-4 mr-3 text-emerald-600"></i>
+                <span>Cuenta verificada</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estadísticas rápidas -->
+        <div class="mt-6 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+            <i class="fas fa-chart-line text-emerald-600 mr-2"></i>
+            Resumen de Actividad
+          </h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="text-center p-3 bg-emerald-50 rounded-lg">
+              <div class="text-2xl font-bold text-emerald-600">12</div>
+              <div class="text-xs text-gray-600">Tareas Completadas</div>
+            </div>
+            <div class="text-center p-3 bg-blue-50 rounded-lg">
+              <div class="text-2xl font-bold text-blue-600">5</div>
+              <div class="text-xs text-gray-600">Proyectos Activos</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Mensajes de respuesta -->
-      <% if (typeof error !== 'undefined') { %>
-        <div class="bg-red-100 text-red-700 p-3 rounded mb-4"><%= error %></div>
-      <% } %>
-      <% if (typeof success !== 'undefined') { %>
-        <div class="bg-green-100 text-green-700 p-3 rounded mb-4"><%= success %></div>
-      <% } %>
-
-      <!-- Formulario para editar perfil -->
-      <h3 class="text-xl font-semibold mb-3">Editar Información</h3>
-      <form action="/profile" method="POST" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Nombre de usuario</label>
-            <input type="text" name="username" id="username" value="<%= user.username %>" required class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
+      <!-- Panel principal de edición -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Mensajes de respuesta globales -->
+        <% if (typeof error !== 'undefined') { %>
+          <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <%= error %>
           </div>
-          <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo electrónico</label>
-            <input type="email" name="email" id="email" value="<%= user.email %>" required class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
+        <% } %>
+        <% if (typeof success !== 'undefined') { %>
+          <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <%= success %>
           </div>
-        </div>
+        <% } %>
 
-        <div>
-          <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nombre completo</label>
-          <input type="text" name="name" id="name" value="<%= user.name %>" required class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-            <input type="text" name="first_name" id="first_name" value="<%= user.first_name || '' %>" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
+        <!-- Formulario de información personal -->
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+          <div class="border-b border-gray-200 px-6 py-4">
+            <h3 class="text-xl font-semibold text-gray-800 flex items-center">
+              <i class="fas fa-user-edit text-emerald-600 mr-2"></i>
+              Información Personal
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">Actualiza tu información de perfil</p>
           </div>
-          <div>
-            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
-            <input type="text" name="last_name" id="last_name" value="<%= user.last_name || '' %>" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
+          
+          <form action="/profile" method="POST" class="p-6">
+            <div class="space-y-6">
+              <!-- Información básica -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                  <label for="username" class="block text-sm font-semibold text-gray-700">
+                    <i class="fas fa-at text-emerald-600 mr-1"></i>
+                    Nombre de usuario
+                  </label>
+                  <input type="text" 
+                         name="username" 
+                         id="username" 
+                         value="<%= user.username %>" 
+                         required 
+                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white">
+                </div>
+                <div class="space-y-2">
+                  <label for="email" class="block text-sm font-semibold text-gray-700">
+                    <i class="fas fa-envelope text-emerald-600 mr-1"></i>
+                    Correo electrónico
+                  </label>
+                  <input type="email" 
+                         name="email" 
+                         id="email" 
+                         value="<%= user.email %>" 
+                         required 
+                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white">
+                </div>
+              </div>
+
+              <!-- Nombre completo -->
+              <div class="space-y-2">
+                <label for="name" class="block text-sm font-semibold text-gray-700">
+                  <i class="fas fa-user text-emerald-600 mr-1"></i>
+                  Nombre completo
+                </label>
+                <input type="text" 
+                       name="name" 
+                       id="name" 
+                       value="<%= user.name %>" 
+                       required 
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white">
+              </div>
+
+              <!-- Nombres separados -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                  <label for="first_name" class="block text-sm font-semibold text-gray-700">
+                    <i class="fas fa-user-tag text-emerald-600 mr-1"></i>
+                    Nombre
+                  </label>
+                  <input type="text" 
+                         name="first_name" 
+                         id="first_name" 
+                         value="<%= user.first_name || '' %>" 
+                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white">
+                </div>
+                <div class="space-y-2">
+                  <label for="last_name" class="block text-sm font-semibold text-gray-700">
+                    <i class="fas fa-user-tag text-emerald-600 mr-1"></i>
+                    Apellido
+                  </label>
+                  <input type="text" 
+                         name="last_name" 
+                         id="last_name" 
+                         value="<%= user.last_name || '' %>" 
+                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white">
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-end pt-6 border-t border-gray-200 mt-6">
+              <button type="submit" 
+                      class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center space-x-2">
+                <i class="fas fa-save"></i>
+                <span>Guardar Cambios</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Formulario de cambio de contraseña -->
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+          <div class="border-b border-gray-200 px-6 py-4">
+            <h3 class="text-xl font-semibold text-gray-800 flex items-center">
+              <i class="fas fa-lock text-emerald-600 mr-2"></i>
+              Seguridad de la Cuenta
+            </h3>
+            <p class="text-sm text-gray-600 mt-1">Mantén tu cuenta segura actualizando tu contraseña</p>
           </div>
-        </div>
 
-        <div class="flex justify-end">
-          <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
-            Guardar Cambios
-          </button>
-        </div>
-      </form>
-    </div>
+          <!-- Mensajes específicos de contraseña -->
+          <% if (typeof passwordError !== 'undefined') { %>
+            <div class="mx-6 mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center">
+              <i class="fas fa-exclamation-circle mr-2"></i>
+              <%= passwordError %>
+            </div>
+          <% } %>
+          <% if (typeof passwordSuccess !== 'undefined') { %>
+            <div class="mx-6 mt-4 bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg flex items-center">
+              <i class="fas fa-check-circle mr-2"></i>
+              <%= passwordSuccess %>
+            </div>
+          <% } %>
 
-    <!-- Cambio de contraseña -->
-    <div class="bg-white rounded-lg shadow-md p-6">
-      <h3 class="text-xl font-semibold mb-3">Cambiar Contraseña</h3>
-      
-      <!-- Mensajes de respuesta para cambio de contraseña -->
-      <% if (typeof passwordError !== 'undefined') { %>
-        <div class="bg-red-100 text-red-700 p-3 rounded mb-4"><%= passwordError %></div>
-      <% } %>
-      <% if (typeof passwordSuccess !== 'undefined') { %>
-        <div class="bg-green-100 text-green-700 p-3 rounded mb-4"><%= passwordSuccess %></div>
-      <% } %>
+          <form action="/change-password" method="POST" class="p-6" id="password-form">
+            <div class="space-y-6">
+              <div class="space-y-2">
+                <label for="currentPassword" class="block text-sm font-semibold text-gray-700">
+                  <i class="fas fa-key text-emerald-600 mr-1"></i>
+                  Contraseña actual
+                </label>
+                <div class="relative">
+                  <input type="password" 
+                         name="currentPassword" 
+                         id="currentPassword" 
+                         required 
+                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white pr-10">
+                  <button type="button" 
+                          class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-password" 
+                          data-target="currentPassword">
+                    <i class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="space-y-2">
+                <label for="newPassword" class="block text-sm font-semibold text-gray-700">
+                  <i class="fas fa-lock text-emerald-600 mr-1"></i>
+                  Nueva contraseña
+                </label>
+                <div class="relative">
+                  <input type="password" 
+                         name="newPassword" 
+                         id="newPassword" 
+                         required 
+                         minlength="6" 
+                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white pr-10">
+                  <button type="button" 
+                          class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-password" 
+                          data-target="newPassword">
+                    <i class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                  </button>
+                </div>
+                <div class="text-xs text-gray-500 flex items-center mt-1">
+                  <i class="fas fa-info-circle mr-1"></i>
+                  Mínimo 6 caracteres
+                </div>
+              </div>
+              
+              <div class="space-y-2">
+                <label for="confirmPassword" class="block text-sm font-semibold text-gray-700">
+                  <i class="fas fa-check-double text-emerald-600 mr-1"></i>
+                  Confirmar nueva contraseña
+                </label>
+                <div class="relative">
+                  <input type="password" 
+                         name="confirmPassword" 
+                         id="confirmPassword" 
+                         required 
+                         minlength="6" 
+                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-gray-50 focus:bg-white pr-10">
+                  <button type="button" 
+                          class="absolute inset-y-0 right-0 pr-3 flex items-center toggle-password" 
+                          data-target="confirmPassword">
+                    <i class="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                  </button>
+                </div>
+                <div id="password-match-indicator" class="text-xs mt-1 hidden">
+                  <span class="flex items-center">
+                    <i class="fas fa-times text-red-500 mr-1"></i>
+                    Las contraseñas no coinciden
+                  </span>
+                </div>
+              </div>
+            </div>
 
-      <form action="/change-password" method="POST" class="space-y-4" id="password-form">
-        <div>
-          <label for="currentPassword" class="block text-sm font-medium text-gray-700 mb-1">Contraseña actual</label>
-          <input type="password" name="currentPassword" id="currentPassword" required class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
+            <div class="flex justify-end pt-6 border-t border-gray-200 mt-6">
+              <button type="submit" 
+                      class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center space-x-2">
+                <i class="fas fa-shield-alt"></i>
+                <span>Cambiar Contraseña</span>
+              </button>
+            </div>
+          </form>
         </div>
-        
-        <div>
-          <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-1">Nueva contraseña</label>
-          <input type="password" name="newPassword" id="newPassword" required minlength="6" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
-        </div>
-        
-        <div>
-          <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirmar nueva contraseña</label>
-          <input type="password" name="confirmPassword" id="confirmPassword" required minlength="6" class="w-full p-2 border rounded focus:ring-blue-500 focus:border-blue-500">
-        </div>
-
-        <div class="flex justify-end">
-          <button type="submit" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded">
-            Cambiar Contraseña
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Validación del formulario de cambio de contraseña
+      // Toggle password visibility
+      document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function() {
+          const targetId = this.getAttribute('data-target');
+          const input = document.getElementById(targetId);
+          const icon = this.querySelector('i');
+          
+          if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+          } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+          }
+        });
+      });
+
+      // Password validation
       const passwordForm = document.getElementById('password-form');
+      const newPassword = document.getElementById('newPassword');
+      const confirmPassword = document.getElementById('confirmPassword');
+      const matchIndicator = document.getElementById('password-match-indicator');
+      
+      function checkPasswordMatch() {
+        if (confirmPassword.value && newPassword.value !== confirmPassword.value) {
+          matchIndicator.classList.remove('hidden');
+          confirmPassword.classList.add('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+          confirmPassword.classList.remove('border-gray-300', 'focus:border-emerald-500', 'focus:ring-emerald-500');
+        } else {
+          matchIndicator.classList.add('hidden');
+          confirmPassword.classList.remove('border-red-300', 'focus:border-red-500', 'focus:ring-red-500');
+          confirmPassword.classList.add('border-gray-300', 'focus:border-emerald-500', 'focus:ring-emerald-500');
+        }
+      }
+
+      newPassword.addEventListener('input', checkPasswordMatch);
+      confirmPassword.addEventListener('input', checkPasswordMatch);
       
       passwordForm.addEventListener('submit', function(e) {
-        const newPassword = document.getElementById('newPassword').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        
-        if (newPassword !== confirmPassword) {
+        if (newPassword.value !== confirmPassword.value) {
           e.preventDefault();
-          alert('Las contraseñas no coinciden');
+          checkPasswordMatch();
+          
+          // Show animated alert
+          const alertDiv = document.createElement('div');
+          alertDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+          alertDiv.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Las contraseñas no coinciden';
+          document.body.appendChild(alertDiv);
+          
+          setTimeout(() => alertDiv.classList.remove('translate-x-full'), 100);
+          setTimeout(() => {
+            alertDiv.classList.add('translate-x-full');
+            setTimeout(() => document.body.removeChild(alertDiv), 300);
+          }, 3000);
         }
       });
     });

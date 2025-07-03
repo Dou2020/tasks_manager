@@ -13,7 +13,12 @@
     "db:migrate": "sequelize db:migrate --config sequelize.config.js --migrations-path src/migrations",
     "db:migrate:undo": "sequelize db:migrate:undo --config sequelize.config.js --migrations-path src/migrations",
     "db:seed": "sequelize db:seed:all --config sequelize.config.js --seeders-path src/seeders",
-    "db:seed:undo": "sequelize db:seed:undo:all --config sequelize.config.js --seeders-path src/seeders"
+    "db:seed:undo": "sequelize db:seed:undo:all --config sequelize.config.js --seeders-path src/seeders",
+    "test": "cross-env NODE_ENV=test jest",
+    "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage",
+    "test:unit": "cross-env NODE_ENV=test jest tests/unit",
+    "test:integration": "cross-env NODE_ENV=test jest tests/integration"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
@@ -39,7 +44,10 @@
     "sequelize-cli": "^6.6.3",
     "supertest": "^7.1.1",
     "ts-jest": "^29.4.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "mock-socket": "^9.2.1",
+    "sqlite3": "^5.1.6",
+    "cross-env": "^7.0.3"
   },
   "author": "El equipo Fundacion",
   "license": "MIT"
