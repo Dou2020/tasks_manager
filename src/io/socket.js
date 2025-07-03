@@ -134,7 +134,7 @@ module.exports = (io, sessionMiddleware) => {
         
         // Abandonar todas las salas de proyectos anteriores
         socketRooms.forEach(room => {
-          const prevProjectId = room.replace('project-', '');
+          room.replace('project-', '');
           console.log(`Abandonando sala anterior: ${room}`);
           socket.leave(room);
         });
@@ -193,7 +193,7 @@ module.exports = (io, sessionMiddleware) => {
       });
 
       // Manejar heartbeat para verificar conexiones activas
-      socket.on('heartbeat', (data) => {
+      socket.on('heartbeat', (/*data*/) => {
         socket.emit('heartbeat-response', { received: true, timestamp: Date.now() });
       });
       

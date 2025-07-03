@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
+    "lint": "eslint ./src",
+    "test": "jest --runInBand",
     "migrate": "sequelize db:migrate",
     "migrate:undo": "sequelize db:migrate:undo:all",
     "db:migrate": "sequelize db:migrate --config sequelize.config.js --migrations-path src/migrations",
@@ -28,8 +30,16 @@
     "socket.io": "^4.7.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.30.1",
+    "@types/jest": "^30.0.0",
+    "eslint": "^9.30.1",
+    "globals": "^16.3.0",
+    "jest": "^30.0.3",
     "nodemon": "^3.1.10",
-    "sequelize-cli": "^6.6.3"
+    "sequelize-cli": "^6.6.3",
+    "supertest": "^7.1.1",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.8.3"
   },
   "author": "El equipo Fundacion",
   "license": "MIT"
