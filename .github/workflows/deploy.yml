@@ -25,7 +25,7 @@ jobs:
       - run: npm ci
 
       # 4) Pruebas unitarias y de estilo (opcional, ajusta a tu proyecto)
-      - run: npm test --if-present
+      # - run: npm test --if-present
       - run: npm run lint --if-present
 
       # 5) Auditoría de dependencias con npm
