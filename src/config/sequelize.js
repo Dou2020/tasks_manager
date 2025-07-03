@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-const path = require('path');
+// const path = require('path');
 
 // Get environment-specific config
 let config;
