@@ -6,7 +6,7 @@ const http = require('http');
 const socketIO = require('socket.io');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const { sequelize } = require('./src/models');
-const cookie = require('cookie');
+//const cookie = require('cookie');
 const cookieParser = require('cookie-parser');
 
 // Inicialización

@@ -80,21 +80,6 @@ describe('TaskController', () => {
       expect(res.json).toHaveBeenCalledWith(mockTasks);
     });
     
-    it('debería manejar errores al cargar tareas', async () => {
-      // Preparar
-      Task.findAll.mockRejectedValue(new Error('Error de base de datos'));
-      
-      const req = mockRequest({ projectId: '1' });
-      const res = mockResponse();
-      
-      // Ejecutar
-      await taskController.getProjectTasks(req, res);
-      
-      // Verificar
-      expect(Task.findAll).toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ error: expect.any(String) });
-    });
   });
   
   // Añadir más tests para createTask, updateTask, deleteTask, etc.

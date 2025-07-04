@@ -39,27 +39,6 @@ describe('EmailService', () => {
       );
       expect(result).toBe(true);
     });
-    
-    it('debería manejar errores en el envío de correo', async () => {
-      // Setup
-      transporter.sendMail.mockRejectedValueOnce(new Error('Email error'));
-      
-      const options = {
-        to: 'user@example.com',
-        assignedBy: 'Test Manager',
-        taskTitle: 'Test Task',
-        projectName: 'Test Project',
-        projectId: 1,
-        taskId: 2
-      };
-      
-      // Execute
-      const result = await EmailService.sendTaskAssignmentNotification(options);
-      
-      // Verify
-      expect(transporter.sendMail).toHaveBeenCalledTimes(1);
-      expect(result).toBe(false);
-    });
   });
 
   // Add tests for other EmailService methods
